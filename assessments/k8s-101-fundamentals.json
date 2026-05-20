@@ -1,0 +1,145 @@
+{
+  "templateVersion": "1.0.0",
+  "id": "k8s-101-fundamentals",
+  "category": "CO",
+  "title": "Kubernetes 101 — Fundamentals",
+  "description": "Validate your understanding of the core Kubernetes concepts covered in this enablement: pods, services, kubectl, k3d, and k9s.",
+  "difficulty": "beginner",
+  "estimatedTime": 10,
+  "imagine": "You just finished the Kubernetes 101 enablement in your Codespace. The TODO app is running on a local k3d cluster, monitored by Dynatrace, and you want to prove you actually understood how the pieces fit together.",
+  "yourGoal": "Answer six questions about Kubernetes fundamentals as they apply to the codespaces lab you just completed. Each question relates directly to a tool or concept the enablement walked through.",
+  "tools": [
+    { "label": "kubectl" },
+    { "label": "k9s" },
+    { "label": "k3d" },
+    { "label": "Dynatrace OneAgent Operator" }
+  ],
+  "story": {
+    "introduction": "The lab Codespace deployed a local k3d Kubernetes cluster with a TODO app and the Dynatrace operator. These questions reinforce what each component does.",
+    "context": "Everything you need to answer can be found in the lab pages covering Codespaces and Content."
+  },
+  "questions": [
+    {
+      "id": "q1-k3d",
+      "type": "multiple-choice",
+      "title": "What is k3d?",
+      "content": "The lab Codespace provisions a local Kubernetes cluster using k3d. What is k3d, exactly?",
+      "options": [
+        { "id": "a", "text": "A managed Kubernetes service provided by Google Cloud", "isCorrect": false, "explanation": "That would be GKE. k3d runs locally." },
+        { "id": "b", "text": "A wrapper that runs the lightweight k3s Kubernetes distribution inside Docker containers", "isCorrect": true, "explanation": "Correct! k3d runs k3s (a stripped-down k8s) inside Docker, perfect for ephemeral environments like Codespaces." },
+        { "id": "c", "text": "A YAML linter for Kubernetes manifests", "isCorrect": false, "explanation": "No — that's tools like kubeval or kube-linter." },
+        { "id": "d", "text": "A replacement for kubectl with a richer CLI", "isCorrect": false, "explanation": "k9s is the richer CLI; k3d provisions the cluster." }
+      ],
+      "correctAnswer": "b",
+      "explanation": "k3d packages k3s into Docker so you can spin up a fully-functional Kubernetes cluster on a laptop or a Codespace in seconds.",
+      "points": 1000,
+      "hints": [
+        "Look at the Codespaces section of the lab — it explicitly mentions which lightweight k8s distribution is used.",
+        "k3s is a Rancher project; k3d is the Docker wrapper around it."
+      ]
+    },
+    {
+      "id": "q2-kubectl-get-pods",
+      "type": "multiple-choice",
+      "title": "Listing pods in a namespace",
+      "content": "Which kubectl command lists all pods running in the 'todoapp' namespace?",
+      "options": [
+        { "id": "a", "text": "kubectl get pods -n todoapp", "isCorrect": true, "explanation": "Correct! The -n flag selects a namespace." },
+        { "id": "b", "text": "kubectl list pods --namespace=todoapp", "isCorrect": false, "explanation": "'list' is not a kubectl verb — use 'get'." },
+        { "id": "c", "text": "kubectl describe pods todoapp", "isCorrect": false, "explanation": "describe shows details of a single pod, not a list across a namespace." },
+        { "id": "d", "text": "kubectl pods --in todoapp", "isCorrect": false, "explanation": "Not valid kubectl syntax." }
+      ],
+      "correctAnswer": "a",
+      "explanation": "kubectl uses verb-noun syntax. 'get pods' lists pods; '-n <namespace>' scopes the query.",
+      "points": 800,
+      "hints": [
+        "The verb you want is 'get'.",
+        "Namespace flag is -n or --namespace."
+      ]
+    },
+    {
+      "id": "q3-k9s",
+      "type": "multiple-choice",
+      "title": "Why use k9s?",
+      "content": "The lab pre-installs k9s alongside kubectl. What does k9s give you that raw kubectl does not?",
+      "options": [
+        { "id": "a", "text": "It applies manifests faster than kubectl by skipping the API server", "isCorrect": false, "explanation": "k9s still goes through the API server — nothing bypasses it." },
+        { "id": "b", "text": "A terminal-based interactive UI for navigating Kubernetes resources in real time", "isCorrect": true, "explanation": "Correct! k9s renders pods, services, logs, and events as a live ncurses-style dashboard." },
+        { "id": "c", "text": "It replaces the cluster control plane during local development", "isCorrect": false, "explanation": "k9s is purely a client-side viewer; it has no control-plane role." },
+        { "id": "d", "text": "It can run on machines without kubectl installed", "isCorrect": false, "explanation": "k9s uses the same kubeconfig as kubectl and needs the cluster to be reachable." }
+      ],
+      "correctAnswer": "b",
+      "explanation": "k9s wraps kubectl with a rich TUI, drastically speeding up exploration, log tailing, and pod debugging.",
+      "points": 800,
+      "hints": [
+        "Think about how the lab page describes navigating the cluster 'like butter'."
+      ]
+    },
+    {
+      "id": "q4-service-vs-pod",
+      "type": "multiple-choice",
+      "title": "Why expose the TODO app via a Service?",
+      "content": "The lab exposes the TODO app via a Kubernetes Service rather than connecting straight to its Pod. What is the main reason?",
+      "options": [
+        { "id": "a", "text": "Services are required for any pod to start", "isCorrect": false, "explanation": "Pods run independently of Services." },
+        { "id": "b", "text": "Pods get ephemeral IPs that change on restart; a Service gives a stable virtual IP and DNS name", "isCorrect": true, "explanation": "Correct! Services decouple consumers from individual pod lifecycles." },
+        { "id": "c", "text": "Only Services can read environment variables", "isCorrect": false, "explanation": "Pods read env vars directly from their spec or ConfigMaps/Secrets." },
+        { "id": "d", "text": "Services run faster than Pods", "isCorrect": false, "explanation": "Services don't 'run' workloads — they route traffic to pods." }
+      ],
+      "correctAnswer": "b",
+      "explanation": "A Kubernetes Service abstracts a dynamic set of Pods behind a stable ClusterIP/DNS, so clients don't break when pods are rescheduled.",
+      "points": 1000,
+      "hints": [
+        "Think about what happens when a Pod is restarted.",
+        "What is unstable about a Pod that a Service fixes?"
+      ]
+    },
+    {
+      "id": "q5-port-forward",
+      "type": "multiple-choice",
+      "title": "Exposing a service from a Codespace",
+      "content": "The lab provides an `exposeTodoApp` helper that runs: `kubectl port-forward service/todoapp 8080:8080 -n todoapp --address=\"0.0.0.0\"`. What does the `--address=\"0.0.0.0\"` flag do?",
+      "options": [
+        { "id": "a", "text": "Forces the port-forward to bind to all network interfaces, not just 127.0.0.1", "isCorrect": true, "explanation": "Correct! Codespaces needs the forwarded port to be reachable from the VS Code host, which requires binding to 0.0.0.0." },
+        { "id": "b", "text": "Sends traffic through the cluster's external load balancer", "isCorrect": false, "explanation": "port-forward never goes through a load balancer." },
+        { "id": "c", "text": "Encrypts the traffic between kubectl and the pod", "isCorrect": false, "explanation": "kubectl port-forward already tunnels through the API server; the address flag is about bind interface." },
+        { "id": "d", "text": "Restricts access to the localhost loopback only", "isCorrect": false, "explanation": "That's the opposite — 127.0.0.1 restricts to loopback; 0.0.0.0 opens it up." }
+      ],
+      "correctAnswer": "a",
+      "explanation": "By default port-forward binds to 127.0.0.1. In Codespaces the VS Code port-forwarder lives outside the container's loopback, so you must bind to 0.0.0.0.",
+      "points": 1200,
+      "hints": [
+        "Why is 127.0.0.1 not enough inside a Codespace?",
+        "The flag controls which interface kubectl listens on."
+      ]
+    },
+    {
+      "id": "q6-oneagent",
+      "type": "multiple-choice",
+      "title": "How does Dynatrace observe the cluster?",
+      "content": "The lab installs the Dynatrace operator using a `DT_OPERATOR_TOKEN`. What does this operator deploy into the cluster?",
+      "options": [
+        { "id": "a", "text": "Only a Grafana dashboard", "isCorrect": false, "explanation": "Dynatrace doesn't deploy Grafana — it has its own platform." },
+        { "id": "b", "text": "OneAgent DaemonSet (and optionally ActiveGate) to capture metrics, traces and logs from the cluster", "isCorrect": true, "explanation": "Correct! The operator manages the OneAgent DaemonSet so every node is instrumented." },
+        { "id": "c", "text": "A second Kubernetes API server for redundancy", "isCorrect": false, "explanation": "Operators never deploy new API servers." },
+        { "id": "d", "text": "Just a sidecar container in the todoapp Pod", "isCorrect": false, "explanation": "The Dynatrace operator manages cluster-wide instrumentation, not single-pod sidecars." }
+      ],
+      "correctAnswer": "b",
+      "explanation": "The Dynatrace Operator reconciles a DynaKube CR and rolls out OneAgent (and optionally ActiveGate) so that every node, pod, and process is observed automatically.",
+      "points": 1200,
+      "hints": [
+        "Operators encode operational knowledge as CRDs + controllers.",
+        "OneAgent is the data collector; what kind of workload deploys to every node?"
+      ]
+    }
+  ],
+  "maxScore": 6000,
+  "tags": ["kubernetes", "k8s", "k3d", "kubectl", "codespaces", "dynatrace"],
+  "learningObjectives": [
+    "Explain what k3d provides and how it differs from kubectl and k9s",
+    "Use the correct kubectl syntax to inspect pods in a namespace",
+    "Describe why a Service is necessary even for a single-pod app",
+    "Understand how port-forwarding works inside a GitHub Codespace",
+    "Recognise how the Dynatrace Operator instruments a Kubernetes cluster"
+  ]
+}
