@@ -132,6 +132,8 @@ For enhancing the documentation just create a Fork of this repo and add a PR.
 If you want to change core files of the framework like in the `functions.sh` file or adding more apps, please create a [fork](https://github.com/dynatrace-wwse/codespaces-synchronizer/fork) in the [codespaces-synchronizer](https://github.com/dynatrace-wwse/codespaces-synchronizer/fork) repository which is the one synchronizing all repositories using the framework.
 
 
+<!-- boundScenarioId: k8s-101-fundamentals -->
+
 <div class="grid cards" markdown>
 - [Let's continue:octicons-arrow-right-24:](cleanup.md)
 </div>

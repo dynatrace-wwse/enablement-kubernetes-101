@@ -86,6 +86,8 @@ showOpenPorts(){
 ```
 
 
+<!-- boundScenarioId: k8s-101-codespaces-workflow -->
+
 <div class="grid cards" markdown>
 - [Let's start our enablement:octicons-arrow-right-24:](4-content.md)
 </div>
