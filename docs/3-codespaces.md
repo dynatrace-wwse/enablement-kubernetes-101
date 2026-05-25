@@ -2,6 +2,8 @@
 
 --8<-- "snippets/dt-enablement.md"
 
+<!-- boundScenarioId: k8s-101-codespaces-workflow -->
+
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/dynatrace-wwse/enablement-codespaces-template){target="_blank"}
 
 TODO: Add the sizing & secrets needed.
