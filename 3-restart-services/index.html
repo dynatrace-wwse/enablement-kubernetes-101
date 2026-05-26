@@ -617,6 +617,12 @@ explanation: "Application pods are Running — OneAgent has been injected and in
 
 <h2 id="verify-logs-in-dynatrace">Verify logs in Dynatrace<a class="headerlink" href="#verify-logs-in-dynatrace" title="Permanent link">#</a></h2>
 <p>Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by creating a TODO item in the application, then verify it appears in Dynatrace.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dql: |
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  fetch logs
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  | filter k8s.namespace.name == &quot;todoapp&quot;
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  | filter contains(content, &quot;Adding a new todo: &quot;)
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>  | limit 1
+</span></code></pre></div>
 <!-- LAB_QUESTION
 type: dql-verification
 question: "Verify Dynatrace is collecting logs from the todoapp namespace"
