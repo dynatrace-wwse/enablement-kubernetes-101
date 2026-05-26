@@ -1,4 +1,8 @@
 
+<!-- STEP_SETUP
+commands:
+  - who=$(whoami) && echo "$whoami" > who.txt 
+-->
 # Prerequisites
 
 Before deploying the Dynatrace Operator, confirm that your Kubernetes cluster is ready and the demo application is running. Use the checks below — both must pass before you continue.

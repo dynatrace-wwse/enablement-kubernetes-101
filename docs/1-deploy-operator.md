@@ -60,9 +60,9 @@ explanation: "Operator manager pod is Running — ready to deploy the DynaKube."
 
 <!-- LAB_QUESTION
 type: multiple-choice
-question: "What does the Dynatrace Operator deploy onto every node in the cluster?"
+question: "What does the Dynatrace Operator deploy by default with no Dynakube?"
 options:
-  - "A sidecar container injected into each pod manually"
+  - "A CSI Driver, the Dynatrace Operator and two Dynatrace Webhooks for resilience"
   - "A OneAgent DaemonSet so every node is automatically instrumented"
   - "A standalone Prometheus exporter that scrapes metrics"
   - "A second Kubernetes API server for high availability"
