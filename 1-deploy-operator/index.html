@@ -597,9 +597,9 @@ explanation: "Operator manager pod is Running — ready to deploy the DynaKube."
 
 <!-- LAB_QUESTION
 type: multiple-choice
-question: "What does the Dynatrace Operator deploy onto every node in the cluster?"
+question: "What does the Dynatrace Operator deploy by default with no Dynakube?"
 options:
-  - "A sidecar container injected into each pod manually"
+  - "A CSI Driver, the Dynatrace Operator and two Dynatrace Webhooks for resilience"
   - "A OneAgent DaemonSet so every node is automatically instrumented"
   - "A standalone Prometheus exporter that scrapes metrics"
   - "A second Kubernetes API server for high availability"
@@ -703,8 +703,19 @@ explanation: "The operator reconciles DynaKube CRs and rolls out a OneAgent Daem
     <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.annotate", "content.tabs.link", "navigation.instant", "navigation.tracking", "navigation.top", "navigation.sections", "navigation.footer", "toc.follow", "search.highlight", "search.suggest", "search.share"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
+  
       <script src="../assets/javascripts/bundle.83f73b43.min.js"></script>
       
     
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof dynatrace !== 'undefined') {
+        dynatrace.sendBizEvent('page_load', {'page': "1. Deploy the Operator"});
+      }
+    });
+  </script>
+  
+
   </body>
 </html>
