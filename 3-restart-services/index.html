@@ -436,6 +436,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#verify-logs-in-dynatrace" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verify logs in Dynatrace
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#knowledge-check" class="md-nav__link">
     <span class="md-ellipsis">
       Knowledge check
@@ -544,6 +553,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#verify-logs-in-dynatrace" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verify logs in Dynatrace
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#knowledge-check" class="md-nav__link">
     <span class="md-ellipsis">
       Knowledge check
@@ -595,6 +613,23 @@ expect:
   value: 0
 hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab, then wait for the rollout to complete."
 explanation: "Application pods are Running — OneAgent has been injected and instrumentation is active."
+-->
+
+<h2 id="verify-logs-in-dynatrace">Verify logs in Dynatrace<a class="headerlink" href="#verify-logs-in-dynatrace" title="Permanent link">#</a></h2>
+<p>Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by creating a TODO item in the application, then verify it appears in Dynatrace.</p>
+<!-- LAB_QUESTION
+type: dql-verification
+question: "Verify Dynatrace is collecting logs from the todoapp namespace"
+buttonText: "Check DT Logs"
+dql: |
+  fetch logs
+  | filter k8s.namespace.name == "todoapp"
+  | filter contains(content, "Adding a new todo: ")
+  | limit 1
+expect:
+  operator: not-empty
+hint: "Open the TODO app, create a new item, then wait 1–2 minutes for logs to appear in Dynatrace."
+explanation: "Dynatrace is collecting logs from todoapp — full observability is active."
 -->
 
 <h2 id="knowledge-check">Knowledge check<a class="headerlink" href="#knowledge-check" title="Permanent link">#</a></h2>
