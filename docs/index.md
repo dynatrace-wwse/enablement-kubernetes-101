@@ -1,26 +1,27 @@
---8<-- "snippets/index.js"
+# Kubernetes 101 — Dynatrace Observability
 
---8<-- "snippets/disclaimer.md"
+In this hands-on training you will instrument a live Kubernetes cluster with Dynatrace from scratch. The cluster and a demo application are already running in your environment. Your job is to deploy the Dynatrace Operator, configure observability via a DynaKube custom resource, and restart the application so Dynatrace can begin collecting metrics, traces, and logs automatically.
 
-## How to to use this template?
-This is a template which will guide you on creating your own Hands-On training. 
-Within this tutorial you'll learn the basics how the codespaces work and how the documentation works, so you can build your own Hands-On training in no time.
+## What you will do
 
-- Prerequisites 
-- Setting up the professors environment
-- Writing the documentation
-- How MkDocs work
-- How to write your own functions
-- Create Github documentation and publish it
-- Tipp & tricks
-- Troubleshooting
+| Step | Action | Validates |
+|------|--------|-----------|
+| Prerequisites | Verify the cluster and demo app are ready | `kubectl get nodes`, `kubectl get pods` |
+| 1 | Deploy the **Dynatrace Operator** via Helm | Operator pod is `Running` in `dynatrace` namespace |
+| 2 | Deploy the **DynaKube** custom resource from the Dynatrace UI | DynaKube object exists; OneAgent pods are `Running` |
+| 3 | **Restart** the application services to pick up instrumentation | Application pods come back `Running` with the agent injected |
 
-<p align="center">
-  <img src="img/dt_professors.png" alt="Professors" width="200">
-</p>
+Each step has an automated shell check built into the documentation — you must pass the check before you can continue.
 
-!!! tip "What will we do"
-    In this tutorial we will learn how easy it is to create an enablement using codespaces and a Kubernetes cluster!
+## Environment overview
 
-<div class="grid cards" markdown>
-- [Yes! let's begin :octicons-arrow-right-24:](2-getting-started.md)
+Your training environment includes:
+
+- A **k3d** single-node Kubernetes cluster
+- A **TODO application** deployed in the `todoapp` namespace
+- Your Dynatrace tenant credentials pre-loaded as environment variables (`DT_ENVIRONMENT`, `DT_OPERATOR_TOKEN`, `DT_INGEST_TOKEN`)
+
+Open the **Terminal** tab above at any time to run kubectl commands directly against your cluster.
+
+!!! tip "Before you start"
+    Click **Start Environment** in the status bar above to provision your live environment. The shell check buttons on each step will not be active until the environment is ready.
