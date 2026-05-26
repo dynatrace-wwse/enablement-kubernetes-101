@@ -9,6 +9,10 @@
       
       
       
+        <link rel="prev" href="../prerequisites/">
+      
+      
+        <link rel="next" href="../2-deploy-dynakube/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -16,7 +20,7 @@
     
     
       
-        <title>3 codespaces - Dynatrace Enablement Lab: Kubernetes 101</title>
+        <title>1. Deploy the Operator - Dynatrace Enablement Lab: Kubernetes 101</title>
       
     
     
@@ -77,7 +81,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#1-codespaces-configuration" class="md-skip">
+        <a href="#section-1-deploy-the-dynatrace-operator" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              3 codespaces
+              1. Deploy the Operator
             
           </span>
         </div>
@@ -298,10 +302,30 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../1-deploy-operator/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    1. Deploy the Operator
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -310,6 +334,71 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How it works
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-create-the-dynatrace-namespace" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1 — Create the dynatrace namespace
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-add-the-dynatrace-helm-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2 — Add the Dynatrace Helm repository
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-install-the-operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3 — Install the operator
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validation
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -391,6 +480,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -399,113 +490,47 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-codespaces-configuration" class="md-nav__link">
+  <a href="#how-it-works" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Codespaces configuration
+      How it works
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-while-the-codespace-is-set-up-for-you-learn-powerful-usecases-with-dynatrace" class="md-nav__link">
+  <a href="#step-1-create-the-dynatrace-namespace" class="md-nav__link">
     <span class="md-ellipsis">
-      2. While the Codespace is set-up for you, learn powerful usecases with Dynatrace
+      Step 1 — Create the dynatrace namespace
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-explore-what-has-been-deployed" class="md-nav__link">
+  <a href="#step-2-add-the-dynatrace-helm-repository" class="md-nav__link">
     <span class="md-ellipsis">
-      3. Explore what has been deployed
+      Step 2 — Add the Dynatrace Helm repository
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-tips-tricks" class="md-nav__link">
+  <a href="#step-3-install-the-operator" class="md-nav__link">
     <span class="md-ellipsis">
-      4. Tips &amp; Tricks
+      Step 3 — Install the operator
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="4. Tips & Tricks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#show-the-greeting" class="md-nav__link">
-    <span class="md-ellipsis">
-      Show the greeting
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#make-your-trainigs-interactive" class="md-nav__link">
-    <span class="md-ellipsis">
-      Make your trainigs interactive
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#navigating-in-your-local-kubernetes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Navigating in your local Kubernetes
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#exposing-the-apps-to-the-public" class="md-nav__link">
-    <span class="md-ellipsis">
-      Exposing the apps to the public
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-troubleshooting" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
-      5. Troubleshooting
+      Validation
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="5. Troubleshooting">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#exposing-the-app" class="md-nav__link">
-    <span class="md-ellipsis">
-      Exposing the App
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#showing-open-ports-in-the-container" class="md-nav__link">
-    <span class="md-ellipsis">
-      Showing open ports in the container
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -527,101 +552,60 @@
   
 
 
-  <h1>3 codespaces</h1>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  dynatrace.sendBizEvent('page_load', {"page": "3. Codespaces"});
-});
-</script>
-
-<details class="example">
-<summary><a href="https://dynatrace-wwse.github.io/codespaces-framework"><img alt="dt-badge" src="https://img.shields.io/badge/Powered_by-DT_Enablement-8A2BE2?logo=dynatrace" /></a></summary>
-<p>This Codespace leverages the Dynatrace Enablement Framework, providing a robust and flexible development environment. Key features include:</p>
-<ul>
-<li>Seamless operation within GitHub Codespaces, as a remote container, or locally via Docker.</li>
-<li>Cross-compilation support for both AMD and ARM architectures, ensuring broad compatibility.</li>
-<li>Adherence to industry standards and best practices to optimize the developer experience.</li>
-<li>Real-time observability of Kubernetes clusters using <a href="https://dynatrace-wwse.github.io/codespaces-framework/dynatrace-integration/">Dynatrace Full-Stack monitoring</a>.</li>
-<li>Integrated <a href="https://dynatrace-wwse.github.io/codespaces-framework/dynatrace-integration/">Dynatrace MCP Server</a> to deliver deep, actionable insights across distributed systems.</li>
-</ul>
-<p>To learn more about the Dynatrace Enablement Framework and how it can enhance your development workflow, please refer to the <a href="https://dynatrace-wwse.github.io/codespaces-framework">official documentation</a>      </p>
-</details>
-<!-- boundScenarioId: k8s-101-codespaces-workflow -->
-
-<p><a href="https://codespaces.new/dynatrace-wwse/enablement-codespaces-template" target="_blank"><img alt="Open in GitHub Codespaces" src="https://github.com/codespaces/badge.svg" /></a></p>
-<p>TODO: Add the sizing &amp; secrets needed.</p>
-<h2 id="1-codespaces-configuration">1. Codespaces configuration<a class="headerlink" href="#1-codespaces-configuration" title="Permanent link">#</a></h2>
-<div class="admonition tip">
-<p class="admonition-title">Branch, Machine sizing &amp; secrets</p>
-<ul>
-<li>Branch<ul>
-<li>select the <strong>main</strong> branch</li>
-</ul>
-</li>
-<li>Machine sizing<ul>
-<li>As a machine type select <strong>2-core</strong></li>
-</ul>
-</li>
-<li>Secrets (enter your credentials within the following variables)<ul>
-<li>DT_ENVIRONMENT</li>
-<li>DT_OPERATOR_TOKEN</li>
-<li>DT_INGEST_TOKEN</li>
-</ul>
-</li>
-</ul>
-</div>
-<h2 id="2-while-the-codespace-is-set-up-for-you-learn-powerful-usecases-with-dynatrace">2. While the Codespace is set-up for you, learn powerful usecases with Dynatrace<a class="headerlink" href="#2-while-the-codespace-is-set-up-for-you-learn-powerful-usecases-with-dynatrace" title="Permanent link">#</a></h2>
-<p>We know your time is very valuable. This codespace takes around 6 minutes to be fully operational. A local Kubernetes (<a href="https://k3d.io/" target="_blank">k3d</a>) cluster monitored by Dynatrace will be configured and in it a sample application, the TODO app will be deployed. To make your experience best, we are also installing and configuring tools like:</p>
-<p><strong>k9s kubectl helm node jq python3 gh</strong></p>
-<p><img alt="Codespaces installing" src="../img/codespaces_installing.png" /></p>
-<h2 id="3-explore-what-has-been-deployed">3. Explore what has been deployed<a class="headerlink" href="#3-explore-what-has-been-deployed" title="Permanent link">#</a></h2>
-<p>Your Codespace has now deployed the following resources:</p>
-<ul>
-<li>
-<p>A local Kubernetes (<a href="https://k3d.io/" target="_blank">k3d</a>) cluster monitored by Dynatrace, with some pre-deployed apps
-  that will be used later in the demo.</p>
-</li>
-<li>
-<p>After a couple of minutes, you'll see this screen in your codespaces terminal. It contains the links to the local expose labguide and the UI of the application which we will be doing our Hands-On training.
-<img alt="Codespaces finish" src="../img/codespaces_finish.png" /></p>
-</li>
-</ul>
-<h2 id="4-tips-tricks">4. Tips &amp; Tricks<a class="headerlink" href="#4-tips-tricks" title="Permanent link">#</a></h2>
-<p>We want to boost your learning and try to make your DEV experience as smooth as possible with Dynatrace trainings. Your Codespaces have a couple of convenience features added. </p>
-<h3 id="show-the-greeting">Show the greeting<a class="headerlink" href="#show-the-greeting" title="Permanent link">#</a></h3>
-<p>In the terminal, there are functions loaded for your convenience. By creating a new Terminal the Greeting will be shown that includes the links to the exposed apps, the Github  pages, the Github Repository, the Dynatrace Tenant that is bound to this devcontainer and some of the tools installed.</p>
-<p>You can create a new Terminal directly in VSCode, type <code>zsh</code> or call the function <code>printGreeting</code> and that will print the greeting with the most relevant information.</p>
-<h3 id="make-your-trainigs-interactive">Make your trainigs interactive<a class="headerlink" href="#make-your-trainigs-interactive" title="Permanent link">#</a></h3>
-<p>All functions writen in the <code>functions.sh</code> file can be called in the terminal. Also the custom ones written in <code>my_functions.sh</code> file. For example there is a custom function as an example called <code>customFunction</code>. Type it in the terminal and see the output.
-<img alt="custom function" src="../img/custom_function.png" /></p>
-<h3 id="navigating-in-your-local-kubernetes">Navigating in your local Kubernetes<a class="headerlink" href="#navigating-in-your-local-kubernetes" title="Permanent link">#</a></h3>
-<p>The client <code>kubectl</code> and <code>k9s</code>are configured so you can navigate in your local Kubernetes like butter. 
-<img alt="k9s" src="../img/k9s.png" /></p>
-<h3 id="exposing-the-apps-to-the-public">Exposing the apps to the public<a class="headerlink" href="#exposing-the-apps-to-the-public" title="Permanent link">#</a></h3>
-<p>The TODO app is being exposed in the devcontainer to your localhost. If you want to make the endpoints public accesible, just go to the ports section in VsCode, right click on them and change the visibility to public.</p>
-<h2 id="5-troubleshooting">5. Troubleshooting<a class="headerlink" href="#5-troubleshooting" title="Permanent link">#</a></h2>
-<h3 id="exposing-the-app">Exposing the App<a class="headerlink" href="#exposing-the-app" title="Permanent link">#</a></h3>
-<p>Apps are automatically registered with the nginx ingress controller and accessible via a magic-DNS URL. Run <code>printGreeting</code> in the terminal to see all app URLs.</p>
-<p>If you need to manually expose the TODO app via port-forward, type <code>exposeTodoApp</code>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>exposeTodoApp<span class="o">(){</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span>printInfo<span class="w"> </span><span class="s2">&quot;Exposing Todo App in your dev.container&quot;</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span>nohup<span class="w"> </span>kubectl<span class="w"> </span>port-forward<span class="w"> </span>service/todoapp<span class="w"> </span><span class="m">8080</span>:8080<span class="w">  </span>-n<span class="w"> </span>todoapp<span class="w"> </span>--address<span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/tmp/kubectl-port-forward.log<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">&amp;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">}</span>
+<h1 id="section-1-deploy-the-dynatrace-operator">Section 1 — Deploy the Dynatrace Operator<a class="headerlink" href="#section-1-deploy-the-dynatrace-operator" title="Permanent link">#</a></h1>
+<p>The <strong>Dynatrace Operator</strong> is a Kubernetes operator that manages the full lifecycle of Dynatrace monitoring components inside your cluster. It watches for <code>DynaKube</code> custom resources and automatically provisions OneAgent DaemonSets and ActiveGate deployments to match the desired monitoring configuration.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">#</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl apply DynaKube CR
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>       │
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>       ▼
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Dynatrace Operator (watches CRDs)
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>       │
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>       ├─► OneAgent DaemonSet  → runs on every node, instruments processes
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>       └─► ActiveGate          → routes data to your Dynatrace tenant
 </span></code></pre></div>
-<h3 id="showing-open-ports-in-the-container">Showing open ports in the container<a class="headerlink" href="#showing-open-ports-in-the-container" title="Permanent link">#</a></h3>
-<p>There is a helper function loaded in the shell to see the open ports in the dev.container.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>showOpenPorts<span class="o">(){</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>sudo<span class="w"> </span>netstat<span class="w"> </span>-tulnp
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="o">}</span>
+<h2 id="step-1-create-the-dynatrace-namespace">Step 1 — Create the dynatrace namespace<a class="headerlink" href="#step-1-create-the-dynatrace-namespace" title="Permanent link">#</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>dynatrace
 </span></code></pre></div>
-<!-- boundScenarioId: k8s-101-codespaces-workflow -->
-
-<div class="grid cards">
-<ul>
-<li><a href="../4-content/">Let's start our enablement<span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span></a></li>
-</ul>
+<h2 id="step-2-add-the-dynatrace-helm-repository">Step 2 — Add the Dynatrace Helm repository<a class="headerlink" href="#step-2-add-the-dynatrace-helm-repository" title="Permanent link">#</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>dynatrace<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>https://raw.githubusercontent.com/Dynatrace/dynatrace-operator/main/config/helm/repos/stable
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>helm<span class="w"> </span>repo<span class="w"> </span>update
+</span></code></pre></div>
+<h2 id="step-3-install-the-operator">Step 3 — Install the operator<a class="headerlink" href="#step-3-install-the-operator" title="Permanent link">#</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>helm<span class="w"> </span>install<span class="w"> </span>dynatrace-operator<span class="w"> </span>dynatrace/dynatrace-operator<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>-n<span class="w"> </span>dynatrace<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span>--atomic
+</span></code></pre></div>
+<p>The <code>--atomic</code> flag waits for all pods to become ready before returning. This typically takes 30–60 seconds.</p>
+<div class="admonition note">
+<p class="admonition-title">Verify the install</p>
+<p>After the command returns, run <code>kubectl get pods -n dynatrace</code> to see the operator manager pod in <code>Running</code> state.</p>
 </div>
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">#</a></h2>
+<p>The check below runs <code>kubectl get pods -n dynatrace</code> and counts pods in <code>Running</code> state. The operator manager pod must be running before you can continue.</p>
+<!-- LAB_QUESTION
+type: shell-verification
+question: "Verify the Dynatrace Operator is running in the dynatrace namespace"
+buttonText: "Check Operator"
+command: "kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -c Running"
+expect:
+  operator: gt
+  value: 0
+hint: "Run the three Helm commands above in the Terminal tab. The `--atomic` flag will wait until the pod is ready."
+explanation: "Operator manager pod is Running — ready to deploy the DynaKube."
+-->
+
+<!-- LAB_QUESTION
+type: multiple-choice
+question: "What does the Dynatrace Operator deploy onto every node in the cluster?"
+options:
+  - "A sidecar container injected into each pod manually"
+  - "A OneAgent DaemonSet so every node is automatically instrumented"
+  - "A standalone Prometheus exporter that scrapes metrics"
+  - "A second Kubernetes API server for high availability"
+correct: 1
+explanation: "The operator reconciles DynaKube CRs and rolls out a OneAgent DaemonSet — one agent pod per node — ensuring full cluster coverage without manual sidecar injection."
+-->
 
 
 
@@ -654,6 +638,44 @@ document.addEventListener('DOMContentLoaded', function() {
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../prerequisites/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Prerequisites">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Prerequisites
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../2-deploy-dynakube/" class="md-footer__link md-footer__link--next" aria-label="Next: 2. Deploy the DynaKube">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                2. Deploy the DynaKube
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">

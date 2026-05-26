@@ -10,7 +10,7 @@
       
       
       
-        <link rel="next" href="2-getting-started/">
+        <link rel="next" href="prerequisites/">
       
       
       <link rel="icon" href="assets/images/favicon.png">
@@ -79,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#how-to-to-use-this-template" class="md-skip">
+        <a href="#kubernetes-101-dynatrace-observability" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              1. About
+              Welcome
             
           </span>
         </div>
@@ -269,12 +269,14 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
   
   <span class="md-ellipsis">
-    1. About
+    Welcome
   </span>
   
 
@@ -285,7 +287,7 @@
         
   
   <span class="md-ellipsis">
-    1. About
+    Welcome
   </span>
   
 
@@ -297,6 +299,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -305,9 +309,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-to-to-use-this-template" class="md-nav__link">
+  <a href="#what-you-will-do" class="md-nav__link">
     <span class="md-ellipsis">
-      How to to use this template?
+      What you will do
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment overview
     </span>
   </a>
   
@@ -328,11 +341,11 @@
   
   
     <li class="md-nav__item">
-      <a href="2-getting-started/" class="md-nav__link">
+      <a href="prerequisites/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    2. Getting started
+    Prerequisites
   </span>
   
 
@@ -348,11 +361,11 @@
   
   
     <li class="md-nav__item">
-      <a href="3-codespaces/" class="md-nav__link">
+      <a href="1-deploy-operator/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    3. Codespaces
+    1. Deploy the Operator
   </span>
   
 
@@ -368,11 +381,11 @@
   
   
     <li class="md-nav__item">
-      <a href="4-content/" class="md-nav__link">
+      <a href="2-deploy-dynakube/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    4. Content
+    2. Deploy the DynaKube
   </span>
   
 
@@ -388,11 +401,11 @@
   
   
     <li class="md-nav__item">
-      <a href="cleanup/" class="md-nav__link">
+      <a href="3-restart-services/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    5. Cleanup
+    3. Restart Application Services
   </span>
   
 
@@ -412,27 +425,7 @@
         
   
   <span class="md-ellipsis">
-    6. Resources
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="whats-next/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    7. What's next?
+    Resources
   </span>
   
 
@@ -458,6 +451,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -466,9 +461,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-to-to-use-this-template" class="md-nav__link">
+  <a href="#what-you-will-do" class="md-nav__link">
     <span class="md-ellipsis">
-      How to to use this template?
+      What you will do
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment overview
     </span>
   </a>
   
@@ -492,50 +496,52 @@
   
 
 
-  <h1>1. About</h1>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  dynatrace.sendBizEvent('page_load', {"page": "1. About"});
-});
-</script>
-
-<div class="admonition example">
-<p class="admonition-title">Support Policy - experiment, share feedback, and help shape the future</p>
-<p>This repository is part of an enablement project created by the Center of Excellence at Dynatrace. Our mission is to empower you to explore and adopt these resources to accelerate innovation.
-Support is community-driven and provided exclusively via <a href="https://github.com/dynatrace-wwse/codespaces-framework/issues">GitHub Issues</a>.</p>
-<p>We will make every effort to assist and address reported problems, but please note:</p>
+<h1 id="kubernetes-101-dynatrace-observability">Kubernetes 101 — Dynatrace Observability<a class="headerlink" href="#kubernetes-101-dynatrace-observability" title="Permanent link">#</a></h1>
+<p>In this hands-on training you will instrument a live Kubernetes cluster with Dynatrace from scratch. The cluster and a demo application are already running in your environment. Your job is to deploy the Dynatrace Operator, configure observability via a DynaKube custom resource, and restart the application so Dynatrace can begin collecting metrics, traces, and logs automatically.</p>
+<h2 id="what-you-will-do">What you will do<a class="headerlink" href="#what-you-will-do" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Validates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prerequisites</td>
+<td>Verify the cluster and demo app are ready</td>
+<td><code>kubectl get nodes</code>, <code>kubectl get pods</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>Deploy the <strong>Dynatrace Operator</strong> via Helm</td>
+<td>Operator pod is <code>Running</code> in <code>dynatrace</code> namespace</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Deploy the <strong>DynaKube</strong> custom resource from the Dynatrace UI</td>
+<td>DynaKube object exists; OneAgent pods are <code>Running</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Restart</strong> the application services to pick up instrumentation</td>
+<td>Application pods come back <code>Running</code> with the agent injected</td>
+</tr>
+</tbody>
+</table>
+<p>Each step has an automated shell check built into the documentation — you must pass the check before you can continue.</p>
+<h2 id="environment-overview">Environment overview<a class="headerlink" href="#environment-overview" title="Permanent link">#</a></h2>
+<p>Your training environment includes:</p>
 <ul>
-<li>The materials are provided “as-is”, without any warranties or guarantees.</li>
-<li>Use of this technology is at your own discretion and risk.</li>
+<li>A <strong>k3d</strong> single-node Kubernetes cluster</li>
+<li>A <strong>TODO application</strong> deployed in the <code>todoapp</code> namespace</li>
+<li>Your Dynatrace tenant credentials pre-loaded as environment variables (<code>DT_ENVIRONMENT</code>, <code>DT_OPERATOR_TOKEN</code>, <code>DT_INGEST_TOKEN</code>)</li>
 </ul>
-<p>We encourage you to experiment, <a href="https://forms.office.com/r/QaCx6VAJe8">share feedback</a>, and help shape the future. Start building today!</p>
-</div>
-<h2 id="how-to-to-use-this-template">How to to use this template?<a class="headerlink" href="#how-to-to-use-this-template" title="Permanent link">#</a></h2>
-<p>This is a template which will guide you on creating your own Hands-On training. 
-Within this tutorial you'll learn the basics how the codespaces work and how the documentation works, so you can build your own Hands-On training in no time.</p>
-<ul>
-<li>Prerequisites </li>
-<li>Setting up the professors environment</li>
-<li>Writing the documentation</li>
-<li>How MkDocs work</li>
-<li>How to write your own functions</li>
-<li>Create Github documentation and publish it</li>
-<li>Tipp &amp; tricks</li>
-<li>Troubleshooting</li>
-</ul>
-<p align="center">
-  <img src="img/dt_professors.png" alt="Professors" width="200">
-</p>
-
+<p>Open the <strong>Terminal</strong> tab above at any time to run kubectl commands directly against your cluster.</p>
 <div class="admonition tip">
-<p class="admonition-title">What will we do</p>
-<p>In this tutorial we will learn how easy it is to create an enablement using codespaces and a Kubernetes cluster!</p>
-</div>
-<div class="grid cards">
-<ul>
-<li><a href="2-getting-started/">Yes! let's begin <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span></a></li>
-</ul>
+<p class="admonition-title">Before you start</p>
+<p>Click <strong>Start Environment</strong> in the status bar above to provision your live environment. The shell check buttons on each step will not be active until the environment is ready.</p>
 </div>
 
 
@@ -575,13 +581,13 @@ Within this tutorial you'll learn the basics how the codespaces work and how the
         
         
           
-          <a href="2-getting-started/" class="md-footer__link md-footer__link--next" aria-label="Next: 2. Getting started">
+          <a href="prerequisites/" class="md-footer__link md-footer__link--next" aria-label="Next: Prerequisites">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                2. Getting started
+                Prerequisites
               </div>
             </div>
             <div class="md-footer__button md-icon">

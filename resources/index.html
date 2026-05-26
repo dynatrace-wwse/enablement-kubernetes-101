@@ -9,10 +9,8 @@
       
       
       
-        <link rel="prev" href="../cleanup/">
+        <link rel="prev" href="../3-restart-services/">
       
-      
-        <link rel="next" href="../whats-next/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -20,7 +18,7 @@
     
     
       
-        <title>6. Resources - Dynatrace Enablement Lab: Kubernetes 101</title>
+        <title>Resources - Dynatrace Enablement Lab: Kubernetes 101</title>
       
     
     
@@ -81,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#get-your-dynatrace-environment" class="md-skip">
+        <a href="#resources" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              6. Resources
+              Resources
             
           </span>
         </div>
@@ -269,7 +267,7 @@
         
   
   <span class="md-ellipsis">
-    1. About
+    Welcome
   </span>
   
 
@@ -285,11 +283,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../2-getting-started/" class="md-nav__link">
+      <a href="../prerequisites/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    2. Getting started
+    Prerequisites
   </span>
   
 
@@ -305,11 +303,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../3-codespaces/" class="md-nav__link">
+      <a href="../1-deploy-operator/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    3. Codespaces
+    1. Deploy the Operator
   </span>
   
 
@@ -325,11 +323,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../4-content/" class="md-nav__link">
+      <a href="../2-deploy-dynakube/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    4. Content
+    2. Deploy the DynaKube
   </span>
   
 
@@ -345,11 +343,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../cleanup/" class="md-nav__link">
+      <a href="../3-restart-services/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    5. Cleanup
+    3. Restart Application Services
   </span>
   
 
@@ -371,12 +369,14 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
   
   <span class="md-ellipsis">
-    6. Resources
+    Resources
   </span>
   
 
@@ -387,7 +387,7 @@
         
   
   <span class="md-ellipsis">
-    6. Resources
+    Resources
   </span>
   
 
@@ -399,6 +399,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -407,27 +409,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#get-your-dynatrace-environment" class="md-nav__link">
+  <a href="#dynatrace-documentation" class="md-nav__link">
     <span class="md-ellipsis">
-      Get your Dynatrace environment
+      Dynatrace documentation
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
+  <a href="#quick-reference-kubectl-commands" class="md-nav__link">
     <span class="md-ellipsis">
-      Documentation
+      Quick reference — kubectl commands
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dynatrace-news" class="md-nav__link">
+  <a href="#dynatrace-helm-chart-reference" class="md-nav__link">
     <span class="md-ellipsis">
-      Dynatrace news
+      Dynatrace Helm chart reference
     </span>
   </a>
   
@@ -437,26 +439,6 @@
   
 </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../whats-next/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    7. What's next?
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -478,6 +460,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -486,27 +470,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#get-your-dynatrace-environment" class="md-nav__link">
+  <a href="#dynatrace-documentation" class="md-nav__link">
     <span class="md-ellipsis">
-      Get your Dynatrace environment
+      Dynatrace documentation
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
+  <a href="#quick-reference-kubectl-commands" class="md-nav__link">
     <span class="md-ellipsis">
-      Documentation
+      Quick reference — kubectl commands
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dynatrace-news" class="md-nav__link">
+  <a href="#dynatrace-helm-chart-reference" class="md-nav__link">
     <span class="md-ellipsis">
-      Dynatrace news
+      Dynatrace Helm chart reference
     </span>
   </a>
   
@@ -530,31 +514,51 @@
   
 
 
-  <h1>6. Resources</h1>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  dynatrace.sendBizEvent('page_load', {"page": "6. Resources"});
-});
-</script>
-
-<h3 id="get-your-dynatrace-environment">Get your Dynatrace environment<a class="headerlink" href="#get-your-dynatrace-environment" title="Permanent link">#</a></h3>
+<h1 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">#</a></h1>
+<h2 id="dynatrace-documentation">Dynatrace documentation<a class="headerlink" href="#dynatrace-documentation" title="Permanent link">#</a></h2>
 <ul>
-<li><a href="https://www.dynatrace.com/signup/" target="_blank">Create a Free Trial in Dynatrace</a></li>
+<li><a href="https://www.dynatrace.com/support/help/setup-and-configuration/setup-on-k8s/installation/dynatrace-operator">Dynatrace Operator for Kubernetes</a></li>
+<li><a href="https://www.dynatrace.com/support/help/setup-and-configuration/setup-on-k8s/reference/dynakube">DynaKube custom resource reference</a></li>
+<li><a href="https://www.dynatrace.com/support/help/platform-modules/infrastructure-monitoring/container-platform-monitoring/kubernetes">Kubernetes monitoring overview</a></li>
+<li><a href="https://www.dynatrace.com/support/help/shortlink/oneagent-kubernetes">OneAgent injection for containers</a></li>
 </ul>
-<h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">#</a></h3>
-<ul>
-<li><a href="https://docs.dynatrace.com" target="_blank">Dynatrace documentation</a></li>
-</ul>
-<h3 id="dynatrace-news">Dynatrace news<a class="headerlink" href="#dynatrace-news" title="Permanent link">#</a></h3>
-<ul>
-<li><a href="https://www.dynatrace.com/news/blog/" target="_blank">Dynatrace Blog</a></li>
-</ul>
-<div class="grid cards">
-<ul>
-<li><a href="../whats-next/">What's Next? <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span></a></li>
-</ul>
-</div>
+<h2 id="quick-reference-kubectl-commands">Quick reference — kubectl commands<a class="headerlink" href="#quick-reference-kubectl-commands" title="Permanent link">#</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Cluster and node status</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>kubectl<span class="w"> </span>cluster-info
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># Namespace management</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>dynatrace
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>kubectl<span class="w"> </span>get<span class="w"> </span>namespaces
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Pod monitoring</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>dynatrace<span class="w"> </span>--watch
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>todoapp
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>kubectl<span class="w"> </span>describe<span class="w"> </span>pod<span class="w"> </span>&lt;pod-name&gt;<span class="w"> </span>-n<span class="w"> </span>dynatrace
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c1"># DynaKube</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>kubectl<span class="w"> </span>get<span class="w"> </span>dynakube<span class="w"> </span>-n<span class="w"> </span>dynatrace
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>kubectl<span class="w"> </span>describe<span class="w"> </span>dynakube<span class="w"> </span>-n<span class="w"> </span>dynatrace
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="c1"># Rolling restart</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>todoapp
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>status<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>todoapp
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="c1"># Logs</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>kubectl<span class="w"> </span>logs<span class="w"> </span>-n<span class="w"> </span>dynatrace<span class="w"> </span>-l<span class="w"> </span><span class="nv">app</span><span class="o">=</span>dynatrace-operator
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>kubectl<span class="w"> </span>logs<span class="w"> </span>-n<span class="w"> </span>dynatrace<span class="w"> </span>-l<span class="w"> </span><span class="nv">app</span><span class="o">=</span>oneagent
+</span></code></pre></div>
+<h2 id="dynatrace-helm-chart-reference">Dynatrace Helm chart reference<a class="headerlink" href="#dynatrace-helm-chart-reference" title="Permanent link">#</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Add repo</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>dynatrace<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>https://raw.githubusercontent.com/Dynatrace/dynatrace-operator/main/config/helm/repos/stable
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># Check installed release</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>helm<span class="w"> </span>list<span class="w"> </span>-n<span class="w"> </span>dynatrace
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="c1"># Uninstall</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>helm<span class="w"> </span>uninstall<span class="w"> </span>dynatrace-operator<span class="w"> </span>-n<span class="w"> </span>dynatrace
+</span></code></pre></div>
 
 
 
@@ -592,7 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../cleanup/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 5. Cleanup">
+          <a href="../3-restart-services/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 3. Restart Application Services">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -602,27 +606,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 Previous
               </span>
               <div class="md-ellipsis">
-                5. Cleanup
+                3. Restart Application Services
               </div>
             </div>
           </a>
         
-        
-          
-          <a href="../whats-next/" class="md-footer__link md-footer__link--next" aria-label="Next: 7. What&#39;s next?">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                7. What's next?
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
         
       </nav>
     

@@ -9,6 +9,10 @@
       
       
       
+        <link rel="prev" href="../1-deploy-operator/">
+      
+      
+        <link rel="next" href="../3-restart-services/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -16,7 +20,7 @@
     
     
       
-        <title>3 codespaces - Dynatrace Enablement Lab: Kubernetes 101</title>
+        <title>2. Deploy the DynaKube - Dynatrace Enablement Lab: Kubernetes 101</title>
       
     
     
@@ -77,7 +81,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#1-codespaces-configuration" class="md-skip">
+        <a href="#section-2-deploy-the-dynakube" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              3 codespaces
+              2. Deploy the DynaKube
             
           </span>
         </div>
@@ -318,10 +322,30 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../2-deploy-dynakube/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    2. Deploy the DynaKube
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -330,6 +354,71 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-open-the-dynatrace-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1 — Open the Dynatrace UI
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-apply-the-generated-manifests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2 — Apply the generated manifests
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-wait-for-oneagent-pods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3 — Wait for OneAgent pods
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation-dynakube-object-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validation — DynaKube object exists
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation-oneagent-pods-are-running" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validation — OneAgent pods are Running
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -391,6 +480,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -399,113 +490,47 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-codespaces-configuration" class="md-nav__link">
+  <a href="#step-1-open-the-dynatrace-ui" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Codespaces configuration
+      Step 1 — Open the Dynatrace UI
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-while-the-codespace-is-set-up-for-you-learn-powerful-usecases-with-dynatrace" class="md-nav__link">
+  <a href="#step-2-apply-the-generated-manifests" class="md-nav__link">
     <span class="md-ellipsis">
-      2. While the Codespace is set-up for you, learn powerful usecases with Dynatrace
+      Step 2 — Apply the generated manifests
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-explore-what-has-been-deployed" class="md-nav__link">
+  <a href="#step-3-wait-for-oneagent-pods" class="md-nav__link">
     <span class="md-ellipsis">
-      3. Explore what has been deployed
+      Step 3 — Wait for OneAgent pods
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-tips-tricks" class="md-nav__link">
+  <a href="#validation-dynakube-object-exists" class="md-nav__link">
     <span class="md-ellipsis">
-      4. Tips &amp; Tricks
+      Validation — DynaKube object exists
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="4. Tips & Tricks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#show-the-greeting" class="md-nav__link">
-    <span class="md-ellipsis">
-      Show the greeting
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#make-your-trainigs-interactive" class="md-nav__link">
-    <span class="md-ellipsis">
-      Make your trainigs interactive
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#navigating-in-your-local-kubernetes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Navigating in your local Kubernetes
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#exposing-the-apps-to-the-public" class="md-nav__link">
-    <span class="md-ellipsis">
-      Exposing the apps to the public
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-troubleshooting" class="md-nav__link">
+  <a href="#validation-oneagent-pods-are-running" class="md-nav__link">
     <span class="md-ellipsis">
-      5. Troubleshooting
+      Validation — OneAgent pods are Running
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="5. Troubleshooting">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#exposing-the-app" class="md-nav__link">
-    <span class="md-ellipsis">
-      Exposing the App
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#showing-open-ports-in-the-container" class="md-nav__link">
-    <span class="md-ellipsis">
-      Showing open ports in the container
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -527,101 +552,57 @@
   
 
 
-  <h1>3 codespaces</h1>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  dynatrace.sendBizEvent('page_load', {"page": "3. Codespaces"});
-});
-</script>
-
-<details class="example">
-<summary><a href="https://dynatrace-wwse.github.io/codespaces-framework"><img alt="dt-badge" src="https://img.shields.io/badge/Powered_by-DT_Enablement-8A2BE2?logo=dynatrace" /></a></summary>
-<p>This Codespace leverages the Dynatrace Enablement Framework, providing a robust and flexible development environment. Key features include:</p>
-<ul>
-<li>Seamless operation within GitHub Codespaces, as a remote container, or locally via Docker.</li>
-<li>Cross-compilation support for both AMD and ARM architectures, ensuring broad compatibility.</li>
-<li>Adherence to industry standards and best practices to optimize the developer experience.</li>
-<li>Real-time observability of Kubernetes clusters using <a href="https://dynatrace-wwse.github.io/codespaces-framework/dynatrace-integration/">Dynatrace Full-Stack monitoring</a>.</li>
-<li>Integrated <a href="https://dynatrace-wwse.github.io/codespaces-framework/dynatrace-integration/">Dynatrace MCP Server</a> to deliver deep, actionable insights across distributed systems.</li>
-</ul>
-<p>To learn more about the Dynatrace Enablement Framework and how it can enhance your development workflow, please refer to the <a href="https://dynatrace-wwse.github.io/codespaces-framework">official documentation</a>      </p>
-</details>
-<!-- boundScenarioId: k8s-101-codespaces-workflow -->
-
-<p><a href="https://codespaces.new/dynatrace-wwse/enablement-codespaces-template" target="_blank"><img alt="Open in GitHub Codespaces" src="https://github.com/codespaces/badge.svg" /></a></p>
-<p>TODO: Add the sizing &amp; secrets needed.</p>
-<h2 id="1-codespaces-configuration">1. Codespaces configuration<a class="headerlink" href="#1-codespaces-configuration" title="Permanent link">#</a></h2>
+<h1 id="section-2-deploy-the-dynakube">Section 2 — Deploy the DynaKube<a class="headerlink" href="#section-2-deploy-the-dynakube" title="Permanent link">#</a></h1>
+<p>The <strong>DynaKube</strong> is a Kubernetes Custom Resource that tells the Dynatrace Operator <em>how</em> to instrument your cluster — which tenant to connect to, which components to deploy, and how to configure them. Without a DynaKube, the operator is installed but idle.</p>
+<h2 id="step-1-open-the-dynatrace-ui">Step 1 — Open the Dynatrace UI<a class="headerlink" href="#step-1-open-the-dynatrace-ui" title="Permanent link">#</a></h2>
+<p>In your Dynatrace tenant, navigate to:</p>
+<p><strong>Infrastructure → Kubernetes → Connect cluster</strong></p>
+<p>Or use the direct path: <code>&lt;your-tenant&gt;/ui/kubernetes</code></p>
+<p>Click <strong>Connect cluster</strong> and follow the wizard. Dynatrace will generate two manifests:</p>
+<ol>
+<li>A <code>Secret</code> containing your tenant URL, operator token, and ingest token</li>
+<li>A <code>DynaKube</code> CR with the recommended configuration for your cluster</li>
+</ol>
+<h2 id="step-2-apply-the-generated-manifests">Step 2 — Apply the generated manifests<a class="headerlink" href="#step-2-apply-the-generated-manifests" title="Permanent link">#</a></h2>
+<p>Copy the <code>kubectl apply</code> command from the Dynatrace wizard and run it in the Terminal:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Example — use the command generated by the Dynatrace UI for your tenant</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://github.com/Dynatrace/dynatrace-operator/releases/latest/download/kubernetes.yaml
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>dynakube.yaml<span class="w">   </span><span class="c1"># the file from the wizard</span>
+</span></code></pre></div>
 <div class="admonition tip">
-<p class="admonition-title">Branch, Machine sizing &amp; secrets</p>
-<ul>
-<li>Branch<ul>
-<li>select the <strong>main</strong> branch</li>
-</ul>
-</li>
-<li>Machine sizing<ul>
-<li>As a machine type select <strong>2-core</strong></li>
-</ul>
-</li>
-<li>Secrets (enter your credentials within the following variables)<ul>
-<li>DT_ENVIRONMENT</li>
-<li>DT_OPERATOR_TOKEN</li>
-<li>DT_INGEST_TOKEN</li>
-</ul>
-</li>
-</ul>
+<p class="admonition-title">Tenant credentials are pre-loaded</p>
+<p>Your environment already has <code>DT_ENVIRONMENT</code>, <code>DT_OPERATOR_TOKEN</code>, and <code>DT_INGEST_TOKEN</code> set. The Dynatrace wizard will detect your tenant from these variables if you are signed in.</p>
 </div>
-<h2 id="2-while-the-codespace-is-set-up-for-you-learn-powerful-usecases-with-dynatrace">2. While the Codespace is set-up for you, learn powerful usecases with Dynatrace<a class="headerlink" href="#2-while-the-codespace-is-set-up-for-you-learn-powerful-usecases-with-dynatrace" title="Permanent link">#</a></h2>
-<p>We know your time is very valuable. This codespace takes around 6 minutes to be fully operational. A local Kubernetes (<a href="https://k3d.io/" target="_blank">k3d</a>) cluster monitored by Dynatrace will be configured and in it a sample application, the TODO app will be deployed. To make your experience best, we are also installing and configuring tools like:</p>
-<p><strong>k9s kubectl helm node jq python3 gh</strong></p>
-<p><img alt="Codespaces installing" src="../img/codespaces_installing.png" /></p>
-<h2 id="3-explore-what-has-been-deployed">3. Explore what has been deployed<a class="headerlink" href="#3-explore-what-has-been-deployed" title="Permanent link">#</a></h2>
-<p>Your Codespace has now deployed the following resources:</p>
-<ul>
-<li>
-<p>A local Kubernetes (<a href="https://k3d.io/" target="_blank">k3d</a>) cluster monitored by Dynatrace, with some pre-deployed apps
-  that will be used later in the demo.</p>
-</li>
-<li>
-<p>After a couple of minutes, you'll see this screen in your codespaces terminal. It contains the links to the local expose labguide and the UI of the application which we will be doing our Hands-On training.
-<img alt="Codespaces finish" src="../img/codespaces_finish.png" /></p>
-</li>
-</ul>
-<h2 id="4-tips-tricks">4. Tips &amp; Tricks<a class="headerlink" href="#4-tips-tricks" title="Permanent link">#</a></h2>
-<p>We want to boost your learning and try to make your DEV experience as smooth as possible with Dynatrace trainings. Your Codespaces have a couple of convenience features added. </p>
-<h3 id="show-the-greeting">Show the greeting<a class="headerlink" href="#show-the-greeting" title="Permanent link">#</a></h3>
-<p>In the terminal, there are functions loaded for your convenience. By creating a new Terminal the Greeting will be shown that includes the links to the exposed apps, the Github  pages, the Github Repository, the Dynatrace Tenant that is bound to this devcontainer and some of the tools installed.</p>
-<p>You can create a new Terminal directly in VSCode, type <code>zsh</code> or call the function <code>printGreeting</code> and that will print the greeting with the most relevant information.</p>
-<h3 id="make-your-trainigs-interactive">Make your trainigs interactive<a class="headerlink" href="#make-your-trainigs-interactive" title="Permanent link">#</a></h3>
-<p>All functions writen in the <code>functions.sh</code> file can be called in the terminal. Also the custom ones written in <code>my_functions.sh</code> file. For example there is a custom function as an example called <code>customFunction</code>. Type it in the terminal and see the output.
-<img alt="custom function" src="../img/custom_function.png" /></p>
-<h3 id="navigating-in-your-local-kubernetes">Navigating in your local Kubernetes<a class="headerlink" href="#navigating-in-your-local-kubernetes" title="Permanent link">#</a></h3>
-<p>The client <code>kubectl</code> and <code>k9s</code>are configured so you can navigate in your local Kubernetes like butter. 
-<img alt="k9s" src="../img/k9s.png" /></p>
-<h3 id="exposing-the-apps-to-the-public">Exposing the apps to the public<a class="headerlink" href="#exposing-the-apps-to-the-public" title="Permanent link">#</a></h3>
-<p>The TODO app is being exposed in the devcontainer to your localhost. If you want to make the endpoints public accesible, just go to the ports section in VsCode, right click on them and change the visibility to public.</p>
-<h2 id="5-troubleshooting">5. Troubleshooting<a class="headerlink" href="#5-troubleshooting" title="Permanent link">#</a></h2>
-<h3 id="exposing-the-app">Exposing the App<a class="headerlink" href="#exposing-the-app" title="Permanent link">#</a></h3>
-<p>Apps are automatically registered with the nginx ingress controller and accessible via a magic-DNS URL. Run <code>printGreeting</code> in the terminal to see all app URLs.</p>
-<p>If you need to manually expose the TODO app via port-forward, type <code>exposeTodoApp</code>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>exposeTodoApp<span class="o">(){</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span>printInfo<span class="w"> </span><span class="s2">&quot;Exposing Todo App in your dev.container&quot;</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span>nohup<span class="w"> </span>kubectl<span class="w"> </span>port-forward<span class="w"> </span>service/todoapp<span class="w"> </span><span class="m">8080</span>:8080<span class="w">  </span>-n<span class="w"> </span>todoapp<span class="w"> </span>--address<span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/tmp/kubectl-port-forward.log<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">&amp;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="o">}</span>
+<h2 id="step-3-wait-for-oneagent-pods">Step 3 — Wait for OneAgent pods<a class="headerlink" href="#step-3-wait-for-oneagent-pods" title="Permanent link">#</a></h2>
+<p>After applying the DynaKube, the operator provisions a OneAgent DaemonSet. On a single-node cluster, one OneAgent pod will start.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>dynatrace<span class="w"> </span>--watch
 </span></code></pre></div>
-<h3 id="showing-open-ports-in-the-container">Showing open ports in the container<a class="headerlink" href="#showing-open-ports-in-the-container" title="Permanent link">#</a></h3>
-<p>There is a helper function loaded in the shell to see the open ports in the dev.container.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>showOpenPorts<span class="o">(){</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>sudo<span class="w"> </span>netstat<span class="w"> </span>-tulnp
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="o">}</span>
-</span></code></pre></div>
-<!-- boundScenarioId: k8s-101-codespaces-workflow -->
+<p>Wait until all pods show <code>Running</code> before continuing.</p>
+<h2 id="validation-dynakube-object-exists">Validation — DynaKube object exists<a class="headerlink" href="#validation-dynakube-object-exists" title="Permanent link">#</a></h2>
+<!-- LAB_QUESTION
+type: shell-verification
+question: "Verify the DynaKube custom resource was created"
+buttonText: "Check DynaKube"
+command: "kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | grep -c ''"
+expect:
+  operator: gt
+  value: 0
+hint: "Apply the manifests from the Dynatrace UI wizard. The DynaKube CR must exist in the dynatrace namespace."
+explanation: "DynaKube CR is present — the operator will now provision monitoring components."
+-->
 
-<div class="grid cards">
-<ul>
-<li><a href="../4-content/">Let's start our enablement<span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span></a></li>
-</ul>
-</div>
+<h2 id="validation-oneagent-pods-are-running">Validation — OneAgent pods are Running<a class="headerlink" href="#validation-oneagent-pods-are-running" title="Permanent link">#</a></h2>
+<!-- LAB_QUESTION
+type: shell-verification
+question: "Verify the OneAgent DaemonSet pods are Running"
+buttonText: "Check OneAgent Pods"
+command: "kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -c Running"
+expect:
+  operator: gt
+  value: 1
+hint: "The OneAgent DaemonSet pod may take 1–2 minutes to start after the DynaKube is applied. Run `kubectl get pods -n dynatrace --watch` to monitor."
+explanation: "OneAgent is running — your cluster nodes are now being instrumented."
+-->
 
 
 
@@ -654,6 +635,44 @@ document.addEventListener('DOMContentLoaded', function() {
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../1-deploy-operator/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 1. Deploy the Operator">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                1. Deploy the Operator
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../3-restart-services/" class="md-footer__link md-footer__link--next" aria-label="Next: 3. Restart Application Services">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                3. Restart Application Services
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">
