@@ -4,13 +4,12 @@ site_name: "Dynatrace Enablement Lab: Kubernetes 101"
 repo_name: "View Code on GitHub"
 repo_url: "https://github.com/dynatrace-wwse/enablement-kubernetes-101"
 nav:
-  - "1. About": index.md
-  - "2. Getting started": 2-getting-started.md
-  - "3. Codespaces": 3-codespaces.md
-  - "4. Content": 4-content.md
-  - "5. Cleanup": cleanup.md
-  - "6. Resources": resources.md
-  - "7. What's next?": whats-next.md
+  - "Welcome": index.md
+  - "Prerequisites": prerequisites.md
+  - "1. Deploy the Operator": 1-deploy-operator.md
+  - "2. Deploy the DynaKube": 2-deploy-dynakube.md
+  - "3. Restart Application Services": 3-restart-services.md
+  - "Resources": resources.md
 
 extra:
   rum_snippet: "https://js-cdn.dynatrace.com/jstag/1612cf70810/bf81393wlb/f20e348d38e305a8_complete.js"
