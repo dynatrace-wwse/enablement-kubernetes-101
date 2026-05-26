@@ -11,8 +11,10 @@ kubectl apply DynaKube CR
        ▼
 Dynatrace Operator (watches CRDs)
        │
-       ├─► OneAgent DaemonSet  → runs on every node, instruments processes
+       ├─► OneAgent DaemonSet  → runs on every node, instruments processes (CloudNativeFullStack only)
        └─► ActiveGate          → routes data to your Dynatrace tenant
+       └─► Webhooks            → Mutate pods before scheduling with init containers
+       └─► CSI Driver          → manages loading of codemodules and images
 ```
 
 ## Step 1 — Create the dynatrace namespace
