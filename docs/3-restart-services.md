@@ -40,6 +40,25 @@ hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab, 
 explanation: "Application pods are Running — OneAgent has been injected and instrumentation is active."
 -->
 
+## Verify logs in Dynatrace
+
+Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by creating a TODO item in the application, then verify it appears in Dynatrace.
+
+<!-- LAB_QUESTION
+type: dql-verification
+question: "Verify Dynatrace is collecting logs from the todoapp namespace"
+buttonText: "Check DT Logs"
+dql: |
+  fetch logs
+  | filter k8s.namespace.name == "todoapp"
+  | filter contains(content, "Adding a new todo: ")
+  | limit 1
+expect:
+  operator: not-empty
+hint: "Open the TODO app, create a new item, then wait 1–2 minutes for logs to appear in Dynatrace."
+explanation: "Dynatrace is collecting logs from todoapp — full observability is active."
+-->
+
 ## Knowledge check
 
 Answer the following questions to complete the training.

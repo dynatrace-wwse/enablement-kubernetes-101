@@ -1,3 +1,9 @@
+<!-- STEP_SETUP
+commands:
+  - dynatraceEvalReadSaveCredentials
+  - generateDynakube
+-->
+
 # Section 2 — Deploy the DynaKube
 
 The **DynaKube** is a Kubernetes Custom Resource that tells the Dynatrace Operator *how* to instrument your cluster — which tenant to connect to, which components to deploy, and how to configure them. Without a DynaKube, the operator is installed but idle.
