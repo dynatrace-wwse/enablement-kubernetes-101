@@ -2,16 +2,22 @@
   "templateVersion": "1.0.0",
   "id": "k8s-101-codespaces-workflow",
   "category": "CO",
-  "title": "Kubernetes 101 — Codespaces & DevContainer Workflow",
+  "title": "Kubernetes 101 \u2014 Codespaces & DevContainer Workflow",
   "description": "Test your knowledge of the GitHub Codespaces development workflow used in this enablement: devcontainer lifecycle and port management.",
   "difficulty": "intermediate",
-  "estimatedTime": 4,
+  "estimatedTime": 6,
   "imagine": "You are a Dynatrace Solutions Engineer building your first enablement lab using the Codespaces framework. You have to make decisions about the devcontainer lifecycle and port visibility.",
-  "yourGoal": "Answer two questions that cover the operational workflow of building and running enablements inside GitHub Codespaces with the Dynatrace Codespaces Framework.",
+  "yourGoal": "Validate that Dynatrace discovered the todoapp namespace, then answer two questions about the Codespaces workflow.",
   "tools": [
-    { "label": "GitHub Codespaces" },
-    { "label": "MkDocs Material" },
-    { "label": "devcontainer.json" }
+    {
+      "label": "GitHub Codespaces"
+    },
+    {
+      "label": "MkDocs Material"
+    },
+    {
+      "label": "devcontainer.json"
+    }
   ],
   "story": {
     "introduction": "The Dynatrace Codespaces Framework automates Kubernetes cluster setup, app deployment, and documentation publishing. Understanding its lifecycle is key to building reliable labs.",
@@ -19,15 +25,54 @@
   },
   "questions": [
     {
+      "id": "q7-dql-namespace",
+      "type": "dql-verification",
+      "title": "Verify Dynatrace discovered the todoapp namespace",
+      "content": "Now that the Dynatrace Operator is running, use DQL to confirm that Dynatrace has discovered the **todoapp** namespace in your cluster.\n\nOpen **Notebooks** in Dynatrace and run this query first to explore what namespaces are visible:\n\n```dql\nfetch dt.entity.cloud_application_namespace\n| fields entity.name\n| limit 20\n```\n\nThen click **Validate** below to confirm `todoapp` is present.",
+      "dql": "fetch dt.entity.cloud_application_namespace | filter matchesPhrase(entity.name, \"todoapp\") | summarize count = count()",
+      "expect": {
+        "operator": "gte",
+        "field": "count",
+        "value": 1
+      },
+      "buttonText": "Validate",
+      "explanation": "Dynatrace discovered the todoapp namespace automatically via the OneAgent DaemonSet. The entity type `dt.entity.cloud_application_namespace` represents every Kubernetes namespace Dynatrace monitors.",
+      "points": 1500,
+      "hints": [
+        "Navigate to Kubernetes in the Dynatrace menu to visually confirm namespaces are visible",
+        "The query uses matchesPhrase \u2014 both \"todoapp\" and similar names will satisfy the check"
+      ]
+    },
+    {
       "id": "q2-devcontainer-lifecycle",
       "type": "multiple-choice",
       "title": "DevContainer lifecycle hooks",
       "content": "The framework uses `post-create.sh` and `post-start.sh` scripts. When does `post-create.sh` execute?",
       "options": [
-        { "id": "a", "text": "Every time the Codespace is resumed from a stopped state", "isCorrect": false, "explanation": "That's when post-start.sh runs. post-create runs only once." },
-        { "id": "b", "text": "Only once, when the container is first created (not on subsequent starts)", "isCorrect": true, "explanation": "Correct! postCreateCommand runs exactly once after the initial container build." },
-        { "id": "c", "text": "Manually, when the user types 'post-create' in the terminal", "isCorrect": false, "explanation": "It's triggered automatically by the devcontainer lifecycle, not invoked manually." },
-        { "id": "d", "text": "During the Docker image build phase, before the container starts", "isCorrect": false, "explanation": "That would be a Dockerfile RUN step. postCreateCommand runs after the container is running." }
+        {
+          "id": "a",
+          "text": "Every time the Codespace is resumed from a stopped state",
+          "isCorrect": false,
+          "explanation": "That's when post-start.sh runs. post-create runs only once."
+        },
+        {
+          "id": "b",
+          "text": "Only once, when the container is first created (not on subsequent starts)",
+          "isCorrect": true,
+          "explanation": "Correct! postCreateCommand runs exactly once after the initial container build."
+        },
+        {
+          "id": "c",
+          "text": "Manually, when the user types 'post-create' in the terminal",
+          "isCorrect": false,
+          "explanation": "It's triggered automatically by the devcontainer lifecycle, not invoked manually."
+        },
+        {
+          "id": "d",
+          "text": "During the Docker image build phase, before the container starts",
+          "isCorrect": false,
+          "explanation": "That would be a Dockerfile RUN step. postCreateCommand runs after the container is running."
+        }
       ],
       "correctAnswer": "b",
       "explanation": "The devcontainer lifecycle has distinct hooks: postCreateCommand (once on creation), postStartCommand (on each start), and postAttachCommand (on each VS Code attach).",
@@ -43,10 +88,30 @@
       "title": "Making Codespace ports public",
       "content": "The lab says ports are exposed locally by default. How do you make an exposed port publicly accessible from outside the Codespace?",
       "options": [
-        { "id": "a", "text": "Add a firewall rule in the devcontainer.json file", "isCorrect": false, "explanation": "devcontainer.json can declare forwarded ports but doesn't manage public visibility." },
-        { "id": "b", "text": "In VS Code's Ports tab, right-click the port and change visibility to 'Public'", "isCorrect": true, "explanation": "Correct! GitHub Codespaces controls port visibility through the VS Code Ports panel." },
-        { "id": "c", "text": "Run 'kubectl expose' with --external flag", "isCorrect": false, "explanation": "kubectl expose creates a Kubernetes Service — it doesn't control Codespace port visibility." },
-        { "id": "d", "text": "Push the code to a public repository", "isCorrect": false, "explanation": "Repository visibility and port visibility are completely independent." }
+        {
+          "id": "a",
+          "text": "Add a firewall rule in the devcontainer.json file",
+          "isCorrect": false,
+          "explanation": "devcontainer.json can declare forwarded ports but doesn't manage public visibility."
+        },
+        {
+          "id": "b",
+          "text": "In VS Code's Ports tab, right-click the port and change visibility to 'Public'",
+          "isCorrect": true,
+          "explanation": "Correct! GitHub Codespaces controls port visibility through the VS Code Ports panel."
+        },
+        {
+          "id": "c",
+          "text": "Run 'kubectl expose' with --external flag",
+          "isCorrect": false,
+          "explanation": "kubectl expose creates a Kubernetes Service \u2014 it doesn't control Codespace port visibility."
+        },
+        {
+          "id": "d",
+          "text": "Push the code to a public repository",
+          "isCorrect": false,
+          "explanation": "Repository visibility and port visibility are completely independent."
+        }
       ],
       "correctAnswer": "b",
       "explanation": "GitHub Codespaces ports default to 'private' (only the Codespace owner can access). Changing to 'public' in the Ports tab makes the forwarded URL accessible to anyone with the link.",
@@ -57,8 +122,14 @@
       ]
     }
   ],
-  "maxScore": 2000,
-  "tags": ["codespaces", "devcontainer", "github-pages", "dynatrace-rum", "workflow"],
+  "maxScore": 3500,
+  "tags": [
+    "codespaces",
+    "devcontainer",
+    "github-pages",
+    "dynatrace-rum",
+    "workflow"
+  ],
   "learningObjectives": [
     "Distinguish between devcontainer lifecycle hooks (post-create vs post-start)",
     "Control port visibility in GitHub Codespaces"
