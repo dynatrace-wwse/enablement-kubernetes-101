@@ -35,11 +35,8 @@ helm repo update
 
 ```bash
 helm install dynatrace-operator dynatrace/dynatrace-operator \
-  -n dynatrace \
-  --atomic
+  -n dynatrace
 ```
-
-The `--atomic` flag waits for all pods to become ready before returning. This typically takes 30–60 seconds.
 
 !!! note "Verify the install"
     After the command returns, run `kubectl get pods -n dynatrace` to see the operator manager pod in `Running` state.
