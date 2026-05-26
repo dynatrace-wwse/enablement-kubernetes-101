@@ -3,11 +3,11 @@
   "id": "k8s-101-codespaces-workflow",
   "category": "CO",
   "title": "Kubernetes 101 — Codespaces & DevContainer Workflow",
-  "description": "Test your knowledge of the GitHub Codespaces development workflow used in this enablement: secrets, devcontainer lifecycle, MkDocs publishing, and port management.",
+  "description": "Test your knowledge of the GitHub Codespaces development workflow used in this enablement: devcontainer lifecycle and port management.",
   "difficulty": "intermediate",
-  "estimatedTime": 8,
-  "imagine": "You are a Dynatrace Solutions Engineer building your first enablement lab using the Codespaces framework. You have to make decisions about secrets, documentation publishing, and port visibility.",
-  "yourGoal": "Answer five questions that cover the operational workflow of building and running enablements inside GitHub Codespaces with the Dynatrace Codespaces Framework.",
+  "estimatedTime": 4,
+  "imagine": "You are a Dynatrace Solutions Engineer building your first enablement lab using the Codespaces framework. You have to make decisions about the devcontainer lifecycle and port visibility.",
+  "yourGoal": "Answer two questions that cover the operational workflow of building and running enablements inside GitHub Codespaces with the Dynatrace Codespaces Framework.",
   "tools": [
     { "label": "GitHub Codespaces" },
     { "label": "MkDocs Material" },
@@ -18,25 +18,6 @@
     "context": "Answers can be found in the lab pages covering Getting Started, Codespaces, and Content."
   },
   "questions": [
-    {
-      "id": "q1-secrets",
-      "type": "multiple-choice",
-      "title": "Codespace secrets",
-      "content": "When launching this Codespace, you configure three secrets: DT_ENVIRONMENT, DT_OPERATOR_TOKEN, and DT_INGEST_TOKEN. Where are these secrets stored and injected from?",
-      "options": [
-        { "id": "a", "text": "They are hardcoded in the devcontainer.json file", "isCorrect": false, "explanation": "Hardcoding secrets in config files would be a security risk — they'd be visible in the repo." },
-        { "id": "b", "text": "They are stored in GitHub Codespaces encrypted secrets and injected as environment variables at launch", "isCorrect": true, "explanation": "Correct! GitHub encrypts Codespace secrets and makes them available as env vars inside the container." },
-        { "id": "c", "text": "They are fetched from the Dynatrace API at container startup", "isCorrect": false, "explanation": "The container needs the DT_ENVIRONMENT URL to talk to Dynatrace in the first place." },
-        { "id": "d", "text": "They are stored in a .env file committed to the repository", "isCorrect": false, "explanation": "Committing secrets to a repo is a security anti-pattern and the framework never does this." }
-      ],
-      "correctAnswer": "b",
-      "explanation": "GitHub Codespaces secrets are per-user encrypted values that are injected as environment variables when the container starts. This keeps them out of source control.",
-      "points": 1000,
-      "hints": [
-        "The lab says to 'enter your credentials within the following variables' when creating the Codespace.",
-        "Think about where GitHub stores user-specific config that is NOT in the repo."
-      ]
-    },
     {
       "id": "q2-devcontainer-lifecycle",
       "type": "multiple-choice",
@@ -54,44 +35,6 @@
       "hints": [
         "Think about what 'create' means in the Codespace lifecycle vs 'start'.",
         "post-create is for one-time setup (install tools, deploy apps); post-start is for recurring tasks."
-      ]
-    },
-    {
-      "id": "q3-mkdocs-rum",
-      "type": "multiple-choice",
-      "title": "MkDocs RUM integration",
-      "content": "Each markdown page includes a JavaScript snippet (e.g., `--8<-- \"snippets/index.js\"`). Why is this required?",
-      "options": [
-        { "id": "a", "text": "It enables syntax highlighting for code blocks in MkDocs", "isCorrect": false, "explanation": "MkDocs Material handles syntax highlighting via its own extensions, not per-page JS snippets." },
-        { "id": "b", "text": "It injects Dynatrace Real User Monitoring (agentless RUM) to track page engagement and time-on-page", "isCorrect": true, "explanation": "Correct! The framework uses agentless RUM to understand which lab pages users spend time on." },
-        { "id": "c", "text": "It imports the MkDocs Material theme for each page", "isCorrect": false, "explanation": "The theme is configured once in mkdocs.yaml, not imported per page." },
-        { "id": "d", "text": "It provides client-side search functionality", "isCorrect": false, "explanation": "MkDocs search is built into the theme and doesn't need per-page JS includes." }
-      ],
-      "correctAnswer": "b",
-      "explanation": "Because the labs use agentless RUM, each page needs a JS snippet to send user interaction data to Dynatrace. The snippet name matches the nav entry for consistency in analytics.",
-      "points": 1200,
-      "hints": [
-        "The lab explains we want to 'monitor the usage and adoption of the Github pages'.",
-        "Since it's agentless RUM, it can't be auto-injected — it must be explicitly added."
-      ]
-    },
-    {
-      "id": "q4-deploy-ghdocs",
-      "type": "multiple-choice",
-      "title": "Publishing GitHub Pages",
-      "content": "The `deployGhdocs` shell function publishes the documentation. What branch does it push the built site to?",
-      "options": [
-        { "id": "a", "text": "main", "isCorrect": false, "explanation": "main contains the source; publishing to it would mix source and output." },
-        { "id": "b", "text": "gh-pages", "isCorrect": true, "explanation": "Correct! MkDocs builds the site and pushes the HTML to the gh-pages branch, which GitHub Pages serves." },
-        { "id": "c", "text": "docs", "isCorrect": false, "explanation": "The 'docs' folder is a source directory, not a branch for published output." },
-        { "id": "d", "text": "release", "isCorrect": false, "explanation": "There is no 'release' branch in this workflow." }
-      ],
-      "correctAnswer": "b",
-      "explanation": "MkDocs' `gh-deploy` command builds the site from source, then force-pushes the output to the gh-pages branch. GitHub Pages then serves the content from that branch.",
-      "points": 800,
-      "hints": [
-        "Look at the deploy output in the lab — it explicitly says which branch it pushes to.",
-        "GitHub Pages typically serves from either a /docs folder on main or a dedicated branch."
       ]
     },
     {
@@ -114,13 +57,10 @@
       ]
     }
   ],
-  "maxScore": 5000,
-  "tags": ["codespaces", "devcontainer", "mkdocs", "github-pages", "dynatrace-rum", "workflow"],
+  "maxScore": 2000,
+  "tags": ["codespaces", "devcontainer", "github-pages", "dynatrace-rum", "workflow"],
   "learningObjectives": [
-    "Explain how GitHub Codespaces secrets are managed and injected",
     "Distinguish between devcontainer lifecycle hooks (post-create vs post-start)",
-    "Describe why per-page JS snippets are needed for agentless RUM in MkDocs",
-    "Know the publishing workflow for GitHub Pages via gh-pages branch",
     "Control port visibility in GitHub Codespaces"
   ]
 }
