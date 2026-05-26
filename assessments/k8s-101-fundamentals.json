@@ -131,15 +131,35 @@
         "Operators encode operational knowledge as CRDs + controllers.",
         "OneAgent is the data collector; what kind of workload deploys to every node?"
       ]
+    },
+    {
+      "id": "q7-dql-namespace",
+      "type": "dql-verification",
+      "title": "Verify Dynatrace discovered the astroshop namespace",
+      "content": "Now that the Dynatrace Operator is running, use DQL to confirm that Dynatrace has discovered the **astroshop** namespace in your cluster.\n\nOpen **Notebooks** in Dynatrace and run this query first to explore what namespaces are visible:\n\n```dql\nfetch dt.entity.cloud_application_namespace\n| fields entity.name\n| limit 20\n```\n\nThen click **Validate** below to confirm `astroshop` is present.",
+      "dql": "fetch dt.entity.cloud_application_namespace | filter matchesPhrase(entity.name, \"astroshop\") | summarize count = count()",
+      "expect": {
+        "operator": "gte",
+        "field": "count",
+        "value": 1
+      },
+      "buttonText": "Validate",
+      "explanation": "Dynatrace discovered the astroshop namespace automatically via the OneAgent DaemonSet. The entity type `dt.entity.cloud_application_namespace` represents every Kubernetes namespace Dynatrace monitors.",
+      "points": 1500,
+      "hints": [
+        "Navigate to Kubernetes in the Dynatrace menu to visually confirm namespaces are visible",
+        "The query uses matchesPhrase — both 'astroshop' and 'astroshop-load' will satisfy the check"
+      ]
     }
   ],
-  "maxScore": 6000,
-  "tags": ["kubernetes", "k8s", "k3d", "kubectl", "codespaces", "dynatrace"],
+  "maxScore": 7500,
+  "tags": ["kubernetes", "k8s", "k3d", "kubectl", "codespaces", "dynatrace", "dql"],
   "learningObjectives": [
     "Explain what k3d provides and how it differs from kubectl and k9s",
     "Use the correct kubectl syntax to inspect pods in a namespace",
     "Describe why a Service is necessary even for a single-pod app",
     "Understand how port-forwarding works inside a GitHub Codespace",
-    "Recognise how the Dynatrace Operator instruments a Kubernetes cluster"
+    "Recognise how the Dynatrace Operator instruments a Kubernetes cluster",
+    "Use DQL to verify Kubernetes namespace discovery in Dynatrace"
   ]
 }
