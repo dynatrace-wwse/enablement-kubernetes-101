@@ -44,6 +44,14 @@ explanation: "Application pods are Running — OneAgent has been injected and in
 
 Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by creating a TODO item in the application, then verify it appears in Dynatrace.
 
+```dql
+dql: |
+  fetch logs
+  | filter k8s.namespace.name == "todoapp"
+  | filter contains(content, "Adding a new todo: ")
+  | limit 1
+```
+
 <!-- LAB_QUESTION
 type: dql-verification
 question: "Verify Dynatrace is collecting logs from the todoapp namespace"
