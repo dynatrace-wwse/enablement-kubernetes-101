@@ -1,7 +1,6 @@
 <!-- STEP_SETUP
 commands:
-  - com=$(pwd) && echo "$com" > test.txt 
-  - dynatraceEvalReadSaveCredentials && generateDynakube && echo "ok" > dynakube-ok.txt
+  - dynatraceEvalReadSaveCredentials && generateDynakube
 -->
 
 # Section 2 — Deploy the DynaKube
