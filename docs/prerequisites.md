@@ -35,6 +35,10 @@ kubectl get pods -n todoapp
 
 Expected output: one or more pods with status `Running`.
 
+![todoapp](img/todoapp.png) 
+
+You can open the app in the navigation tab "Apps". Once it's registered you'll be able to open the app so you can interact with it.
+
 <!-- LAB_QUESTION
 type: shell-verification
 question: "Verify the TODO application pods are Running"
