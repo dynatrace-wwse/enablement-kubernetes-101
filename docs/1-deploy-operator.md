@@ -57,6 +57,7 @@ hint: "Run the three Helm commands above in the Terminal tab. The `--atomic` fla
 explanation: "Operator manager pod is Running — ready to deploy the DynaKube."
 -->
 
+TODO: Change this question, we are not deploying a CNFS, but AppOnly. So we deploy CSI Driver, Operator and Webhook. Think of a question for AppOnly. 
 <!-- LAB_QUESTION
 type: multiple-choice
 question: "What does the Dynatrace Operator deploy by default with no Dynakube?"
@@ -65,6 +66,6 @@ options:
   - "A OneAgent DaemonSet so every node is automatically instrumented"
   - "A standalone Prometheus exporter that scrapes metrics"
   - "A second Kubernetes API server for high availability"
-correct: 1
+correct: 0
 explanation: "The operator reconciles DynaKube CRs and rolls out a OneAgent DaemonSet — one agent pod per node — ensuring full cluster coverage without manual sidecar injection."
 -->

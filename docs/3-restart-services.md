@@ -28,6 +28,8 @@ Open your Dynatrace tenant and navigate to **Services** or **Kubernetes** — wi
 
 ## Validation
 
+TODO: To verify that the todoapp has injection of Dynatrace, check the annotations of the pod of the todoapp, verify i it contains the annotation "oneagent.dynatrace.com/injected: true". 
+
 <!-- LAB_QUESTION
 type: shell-verification
 question: "Verify the todoapp pods are Running after the restart"
@@ -44,6 +46,9 @@ explanation: "Application pods are Running — OneAgent has been injected and in
 
 Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by creating a TODO item in the application, then verify it appears in Dynatrace.
 
+
+TODO:  I want that the user can run DQLs in the app/lab and we can prefill them. Like the one below. Like if it was in a notebook.
+
 ```dql
 dql: |
   fetch logs
@@ -51,6 +56,8 @@ dql: |
   | filter contains(content, "Adding a new todo: ")
   | limit 1
 ```
+
+TODO: Here we add variables, either we add one for the clusterId where we adapt the filter with the clusterId to be sure is only from this training and not from another, or we add the startup time of the training or add that least the last 10 minutes, I want a report how the implementation is done. Simple and easy.
 
 <!-- LAB_QUESTION
 type: dql-verification
@@ -67,9 +74,15 @@ hint: "Open the TODO app, create a new item, then wait 1–2 minutes for logs to
 explanation: "Dynatrace is collecting logs from todoapp — full observability is active."
 -->
 
+
+TODO: Similar to the Kubernetes App, we add a button for the Services of the cluster, where we have {app.services/cluster.id} /ui/apps/dynatrace.services/, for the cluster with the kubernetes-101 name is the link /ui/apps/dynatrace.services/explorer/services?perspective=performance&sort=healthIndicators%3Adescending#filtering=k8s.cluster.name+%3D+enablement-kubernetes-101  
+
 ## Knowledge check
 
 Answer the following questions to complete the training.
+
+
+TODO: adapt the questions and answers of the k8s-fundamentals to be easy, in regards of kubernetes and dynatrace with application monitoring, you find them in the .assesment folder. 
 
 <!-- boundScenarioId: k8s-101-fundamentals -->
 

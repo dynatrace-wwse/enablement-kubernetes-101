@@ -60,7 +60,9 @@ hint: "Apply the manifests from the Dynatrace UI wizard. The DynaKube CR must ex
 explanation: "DynaKube CR is present — the operator will now provision monitoring components."
 -->
 
-## Validation — OneAgent pods are Running
+## Validation — ActiveGate pods are Running
+
+TODO: Change this to verify the ActiveGate por is ready and running. It contains in the nage activegate and should be running.
 
 <!-- LAB_QUESTION
 type: shell-verification
@@ -73,3 +75,6 @@ expect:
 hint: "The OneAgent DaemonSet pod may take 1–2 minutes to start after the DynaKube is applied. Run `kubectl get pods -n dynatrace --watch` to monitor."
 explanation: "OneAgent is running — your cluster nodes are now being instrumented."
 -->
+
+
+TODO: We tell the user that he can open the kubernetes cluster directly from heren, we can add a button to open in a new tab the kubernetes app, we need a way to make this dynamic like { app.kubernetes } that opens the ui/apps/dynatrace.kubernetes. 

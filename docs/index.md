@@ -2,13 +2,16 @@
 
 In this hands-on training you will instrument a live Kubernetes cluster with Dynatrace from scratch. The cluster and a demo application are already running in your environment. Your job is to deploy the Dynatrace Operator, configure observability via a DynaKube custom resource, and restart the application so Dynatrace can begin collecting metrics, traces, and logs automatically.
 
+
+TODO: Add a public Kubernetes short video that can be played in the app. It will be later replaced with a video of myself welcoming the user to the experience.
+
 ## What you will do
 
 | Step | Action | Validates |
 |------|--------|-----------|
 | Prerequisites | Verify the cluster and demo app are ready | `kubectl get nodes`, `kubectl get pods` |
 | 1 | Deploy the **Dynatrace Operator** via Helm | Operator pod is `Running` in `dynatrace` namespace |
-| 2 | Deploy the **DynaKube** custom resource from the Dynatrace UI | DynaKube object exists; OneAgent pods are `Running` |
+| 2 | Deploy the **DynaKube** custom resource from the Dynatrace UI | DynaKube object exists; ActiveGate pod is `Running` |
 | 3 | **Restart** the application services to pick up instrumentation | Application pods come back `Running` with the agent injected |
 
 Each step has an automated shell check built into the documentation — you must pass the check before you can continue.
