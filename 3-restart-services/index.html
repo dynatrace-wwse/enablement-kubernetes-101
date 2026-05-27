@@ -427,9 +427,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#validation" class="md-nav__link">
+  <a href="#validation-oneagent-injected" class="md-nav__link">
     <span class="md-ellipsis">
-      Validation
+      Validation — OneAgent injected
     </span>
   </a>
   
@@ -439,6 +439,15 @@
   <a href="#verify-logs-in-dynatrace" class="md-nav__link">
     <span class="md-ellipsis">
       Verify logs in Dynatrace
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explore-your-services-in-dynatrace" class="md-nav__link">
+    <span class="md-ellipsis">
+      Explore your services in Dynatrace
     </span>
   </a>
   
@@ -544,9 +553,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#validation" class="md-nav__link">
+  <a href="#validation-oneagent-injected" class="md-nav__link">
     <span class="md-ellipsis">
-      Validation
+      Validation — OneAgent injected
     </span>
   </a>
   
@@ -556,6 +565,15 @@
   <a href="#verify-logs-in-dynatrace" class="md-nav__link">
     <span class="md-ellipsis">
       Verify logs in Dynatrace
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explore-your-services-in-dynatrace" class="md-nav__link">
+    <span class="md-ellipsis">
+      Explore your services in Dynatrace
     </span>
   </a>
   
@@ -602,27 +620,33 @@
 <p>When the rollout finishes, the new pods will have been started with OneAgent already injected.</p>
 <h2 id="step-3-verify-in-dynatrace">Step 3 — Verify in Dynatrace<a class="headerlink" href="#step-3-verify-in-dynatrace" title="Permanent link">#</a></h2>
 <p>Open your Dynatrace tenant and navigate to <strong>Services</strong> or <strong>Kubernetes</strong> — within a few minutes you should see the <code>todoapp</code> service and its processes appearing automatically, with distributed traces flowing in.</p>
-<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">#</a></h2>
+<h2 id="validation-oneagent-injected">Validation — OneAgent injected<a class="headerlink" href="#validation-oneagent-injected" title="Permanent link">#</a></h2>
+<p>The check below verifies that the restarted pods have the <code>oneagent.dynatrace.com/injected: "true"</code> annotation set by the mutating webhook. This annotation is the definitive proof that the agent was successfully injected at pod startup.</p>
 <!-- LAB_QUESTION
 type: shell-verification
-question: "Verify the todoapp pods are Running after the restart"
-buttonText: "Check Application Pods"
-command: "kubectl get pods -n todoapp --no-headers 2>/dev/null | grep -c Running"
+question: "Verify OneAgent was injected into the todoapp pods"
+buttonText: "Check Injection"
+command: "kubectl get pods -n todoapp -o jsonpath='{.items[*].metadata.annotations.oneagent\\.dynatrace\\.com/injected}' 2>/dev/null | tr ' ' '\\n' | grep -c true"
 expect:
   operator: gt
   value: 0
-hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab, then wait for the rollout to complete."
-explanation: "Application pods are Running — OneAgent has been injected and instrumentation is active."
+hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab, then wait for the rollout to complete. The injection annotation is only set on pods started after the DynaKube was applied."
+explanation: "OneAgent injected — the todoapp pods have the `oneagent.dynatrace.com/injected: true` annotation confirming agent injection at startup."
 -->
 
 <h2 id="verify-logs-in-dynatrace">Verify logs in Dynatrace<a class="headerlink" href="#verify-logs-in-dynatrace" title="Permanent link">#</a></h2>
-<p>Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by creating a TODO item in the application, then verify it appears in Dynatrace.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dql: |
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  fetch logs
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  | filter k8s.namespace.name == &quot;todoapp&quot;
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  | filter contains(content, &quot;Adding a new todo: &quot;)
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>  | limit 1
+<p>Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by opening the TODO app and creating a new item, then verify it appears in Dynatrace Notebooks.</p>
+<p>Open DT Notebooks and run this DQL to explore your logs:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>fetch logs
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>| filter k8s.namespace.name == &quot;todoapp&quot;
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>| filter contains(content, &quot;Adding a new todo: &quot;)
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>| filter timestamp &gt; now() - 10m
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>| limit 5
 </span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Time filter</p>
+<p>The query uses <code>filter timestamp &gt; now() - 10m</code> to show only logs from the last 10 minutes. This ensures you see logs from <strong>your</strong> training session and not from previous runs.</p>
+</div>
 <!-- LAB_QUESTION
 type: dql-verification
 question: "Verify Dynatrace is collecting logs from the todoapp namespace"
@@ -631,6 +655,7 @@ dql: |
   fetch logs
   | filter k8s.namespace.name == "todoapp"
   | filter contains(content, "Adding a new todo: ")
+  | filter timestamp > now() - 10m
   | limit 1
 expect:
   operator: not-empty
@@ -638,6 +663,9 @@ hint: "Open the TODO app, create a new item, then wait 1–2 minutes for logs to
 explanation: "Dynatrace is collecting logs from todoapp — full observability is active."
 -->
 
+<h2 id="explore-your-services-in-dynatrace">Explore your services in Dynatrace<a class="headerlink" href="#explore-your-services-in-dynatrace" title="Permanent link">#</a></h2>
+<p>Now that the application is instrumented, use the Dynatrace Services App to see the automatically discovered services, performance indicators, and distributed traces from the <code>todoapp</code> namespace.</p>
+<p><a href="placeholder">dt-app|dynatrace.services|Open Services App</a></p>
 <h2 id="knowledge-check">Knowledge check<a class="headerlink" href="#knowledge-check" title="Permanent link">#</a></h2>
 <p>Answer the following questions to complete the training.</p>
 <!-- boundScenarioId: k8s-101-fundamentals -->

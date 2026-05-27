@@ -389,9 +389,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-wait-for-oneagent-pods" class="md-nav__link">
+  <a href="#step-3-wait-for-activegate-and-pods" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 3 — Wait for OneAgent pods
+      Step 3 — Wait for ActiveGate and pods
     </span>
   </a>
   
@@ -407,9 +407,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#validation-oneagent-pods-are-running" class="md-nav__link">
+  <a href="#validation-activegate-is-running" class="md-nav__link">
     <span class="md-ellipsis">
-      Validation — OneAgent pods are Running
+      Validation — ActiveGate is Running
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explore-your-cluster-in-dynatrace" class="md-nav__link">
+    <span class="md-ellipsis">
+      Explore your cluster in Dynatrace
     </span>
   </a>
   
@@ -508,9 +517,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-wait-for-oneagent-pods" class="md-nav__link">
+  <a href="#step-3-wait-for-activegate-and-pods" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 3 — Wait for OneAgent pods
+      Step 3 — Wait for ActiveGate and pods
     </span>
   </a>
   
@@ -526,9 +535,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#validation-oneagent-pods-are-running" class="md-nav__link">
+  <a href="#validation-activegate-is-running" class="md-nav__link">
     <span class="md-ellipsis">
-      Validation — OneAgent pods are Running
+      Validation — ActiveGate is Running
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explore-your-cluster-in-dynatrace" class="md-nav__link">
+    <span class="md-ellipsis">
+      Explore your cluster in Dynatrace
     </span>
   </a>
   
@@ -579,8 +597,8 @@ commands:
 <p class="admonition-title">Tenant credentials are pre-loaded</p>
 <p>Your environment already has <code>DT_ENVIRONMENT</code>, <code>DT_OPERATOR_TOKEN</code>, and <code>DT_INGEST_TOKEN</code> set. The Dynatrace wizard will detect your tenant from these variables if you are signed in.</p>
 </div>
-<h2 id="step-3-wait-for-oneagent-pods">Step 3 — Wait for OneAgent pods<a class="headerlink" href="#step-3-wait-for-oneagent-pods" title="Permanent link">#</a></h2>
-<p>After applying the DynaKube, the operator provisions a OneAgent DaemonSet. On a single-node cluster, one OneAgent pod will start.</p>
+<h2 id="step-3-wait-for-activegate-and-pods">Step 3 — Wait for ActiveGate and pods<a class="headerlink" href="#step-3-wait-for-activegate-and-pods" title="Permanent link">#</a></h2>
+<p>After applying the DynaKube, the operator provisions an ActiveGate pod and the CSI driver. On a single-node cluster, the ActiveGate pod will start first, followed by the CSI components.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>dynatrace<span class="w"> </span>--watch
 </span></code></pre></div>
 <p>Wait until all pods show <code>Running</code> before continuing.</p>
@@ -597,18 +615,22 @@ hint: "Apply the manifests from the Dynatrace UI wizard. The DynaKube CR must ex
 explanation: "DynaKube CR is present — the operator will now provision monitoring components."
 -->
 
-<h2 id="validation-oneagent-pods-are-running">Validation — OneAgent pods are Running<a class="headerlink" href="#validation-oneagent-pods-are-running" title="Permanent link">#</a></h2>
+<h2 id="validation-activegate-is-running">Validation — ActiveGate is Running<a class="headerlink" href="#validation-activegate-is-running" title="Permanent link">#</a></h2>
 <!-- LAB_QUESTION
 type: shell-verification
-question: "Verify the OneAgent DaemonSet pods are Running"
-buttonText: "Check OneAgent Pods"
-command: "kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -c Running"
+question: "Verify the ActiveGate pod is Running in the dynatrace namespace"
+buttonText: "Check ActiveGate"
+command: "kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -i activegate | grep -c Running"
 expect:
   operator: gt
-  value: 1
-hint: "The OneAgent DaemonSet pod may take 1–2 minutes to start after the DynaKube is applied. Run `kubectl get pods -n dynatrace --watch` to monitor."
-explanation: "OneAgent is running — your cluster nodes are now being instrumented."
+  value: 0
+hint: "The ActiveGate pod may take 1–2 minutes to start after the DynaKube is applied. Run `kubectl get pods -n dynatrace --watch` to monitor progress."
+explanation: "ActiveGate is Running — your cluster is connected to the Dynatrace tenant and data will start flowing."
 -->
+
+<h2 id="explore-your-cluster-in-dynatrace">Explore your cluster in Dynatrace<a class="headerlink" href="#explore-your-cluster-in-dynatrace" title="Permanent link">#</a></h2>
+<p>Once the ActiveGate is running, your cluster is visible in the Dynatrace Kubernetes app. Open it to see live cluster topology, node health, and workload status.</p>
+<p><a href="placeholder">dt-app|dynatrace.kubernetes|Open Kubernetes App</a></p>
 
 
 

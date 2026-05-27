@@ -553,18 +553,18 @@
 
 
 <h1 id="section-1-deploy-the-dynatrace-operator">Section 1 — Deploy the Dynatrace Operator<a class="headerlink" href="#section-1-deploy-the-dynatrace-operator" title="Permanent link">#</a></h1>
-<p>The <strong>Dynatrace Operator</strong> is a Kubernetes operator that manages the full lifecycle of Dynatrace monitoring components inside your cluster. It watches for <code>DynaKube</code> custom resources and automatically provisions OneAgent DaemonSets and ActiveGate deployments to match the desired monitoring configuration.</p>
+<p>The <strong>Dynatrace Operator</strong> is a Kubernetes operator that manages the full lifecycle of Dynatrace monitoring components inside your cluster. It watches for <code>DynaKube</code> custom resources and automatically provisions the monitoring configuration that matches your desired mode.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">#</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl apply DynaKube CR
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>       │
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>       ▼
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Dynatrace Operator (watches CRDs)
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>       │
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>       ├─► OneAgent DaemonSet  → runs on every node, instruments processes (CloudNativeFullStack only)
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>       └─► ActiveGate          → routes data to your Dynatrace tenant
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>       └─► Webhooks            → Mutate pods before scheduling with init containers
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>       └─► CSI Driver          → manages loading of codemodules and images
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>       ├─► CSI Driver          → mounts code modules into application pods
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>       ├─► Mutating Webhook    → intercepts new pods and injects the agent
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>       └─► ActiveGate          → routes data to your Dynatrace tenant
 </span></code></pre></div>
+<p>In <strong>AppOnly</strong> mode (used in this lab), the operator does <strong>not</strong> run a OneAgent DaemonSet on every node. Instead, it uses a CSI driver and a mutating webhook to inject the Dynatrace agent library directly into application pod file systems at startup — no node-level privileges required.</p>
 <h2 id="step-1-create-the-dynatrace-namespace">Step 1 — Create the dynatrace namespace<a class="headerlink" href="#step-1-create-the-dynatrace-namespace" title="Permanent link">#</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>dynatrace
 </span></code></pre></div>
@@ -591,20 +591,20 @@ command: "kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -c Runni
 expect:
   operator: gt
   value: 0
-hint: "Run the three Helm commands above in the Terminal tab. The `--atomic` flag will wait until the pod is ready."
+hint: "Run the three Helm commands above in the Terminal tab. Wait a few seconds for the operator pod to reach Running state."
 explanation: "Operator manager pod is Running — ready to deploy the DynaKube."
 -->
 
 <!-- LAB_QUESTION
 type: multiple-choice
-question: "What does the Dynatrace Operator deploy by default with no Dynakube?"
+question: "With AppOnly mode, the Dynatrace Operator does NOT run a OneAgent DaemonSet on every node. What does it use instead to instrument your application pods?"
 options:
-  - "A CSI Driver, the Dynatrace Operator and two Dynatrace Webhooks for resilience"
-  - "A OneAgent DaemonSet so every node is automatically instrumented"
-  - "A standalone Prometheus exporter that scrapes metrics"
-  - "A second Kubernetes API server for high availability"
-correct: 1
-explanation: "The operator reconciles DynaKube CRs and rolls out a OneAgent DaemonSet — one agent pod per node — ensuring full cluster coverage without manual sidecar injection."
+  - "A CSI driver that mounts code modules into each pod, combined with a mutating webhook that injects the agent at startup"
+  - "A OneAgent DaemonSet that runs on every node and instruments all processes"
+  - "Manual sidecar injection — the developer must add an init container to every pod YAML"
+  - "A Prometheus exporter sidecar that is automatically added to every pod"
+correct: 0
+explanation: "AppOnly uses a CSI driver (for code module delivery) and a mutating webhook (for automatic injection at pod creation). No kernel-level DaemonSet is needed, making it suitable for restricted environments."
 -->
 
 
