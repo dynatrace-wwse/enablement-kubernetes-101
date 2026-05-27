@@ -371,6 +371,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How it works
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-you-deploy-the-dynakube-with-application-observability-in-this-scenario" class="md-nav__link">
+    <span class="md-ellipsis">
+      When you deploy the DynaKube with Application Observability in this scenario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#step-1-open-the-dynatrace-ui" class="md-nav__link">
     <span class="md-ellipsis">
       Step 1 — Open the Dynatrace UI
@@ -499,6 +523,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How it works
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-you-deploy-the-dynakube-with-application-observability-in-this-scenario" class="md-nav__link">
+    <span class="md-ellipsis">
+      When you deploy the DynaKube with Application Observability in this scenario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#step-1-open-the-dynatrace-ui" class="md-nav__link">
     <span class="md-ellipsis">
       Step 1 — Open the Dynatrace UI
@@ -580,6 +628,16 @@ commands:
 
 <h1 id="section-2-deploy-the-dynakube">Section 2 — Deploy the DynaKube<a class="headerlink" href="#section-2-deploy-the-dynakube" title="Permanent link">#</a></h1>
 <p>The <strong>DynaKube</strong> is a Kubernetes Custom Resource that tells the Dynatrace Operator <em>how</em> to instrument your cluster — which tenant to connect to, which components to deploy, and how to configure them. Without a DynaKube, the operator is installed but idle.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">#</a></h2>
+<p>The <a href="https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/reference/dynakube"><strong>DynaKube</strong></a> custom resource is the single source of truth for how Dynatrace monitors your cluster. It tells the operator which <a href="https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/guides/operation/configuration">monitoring mode</a> to use, which tenant to connect to, and which optional components to enable.</p>
+<h3 id="when-you-deploy-the-dynakube-with-application-observability-in-this-scenario">When you deploy the DynaKube with Application Observability in this scenario<a class="headerlink" href="#when-you-deploy-the-dynakube-with-application-observability-in-this-scenario" title="Permanent link">#</a></h3>
+<ul>
+<li><strong><a href="https://docs.dynatrace.com/docs/manage/activegate">ActiveGate</a></strong> — routes observability data from your cluster to the Dynatrace tenant, acting as a secure proxy.</li>
+<li><strong><a href="https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/guides/operation/configuration/application-only">Code Modules</a></strong> — injected into your application pods via the CSI driver to enable deep code-level monitoring and observability.</li>
+<li><strong><a href="https://docs.dynatrace.com/docs/extend-dynatrace/opentelemetry/collector/deployment">OpenTelemetry Collector</a></strong> — deployed to collect and forward OpenTelemetry signals (traces, metrics, logs) to Dynatrace.</li>
+<li><strong><a href="https://docs.dynatrace.com/docs/observe-and-explore/logs/log-monitoring">Log Monitoring Module</a></strong> — deployed to capture and ingest container and application logs.</li>
+</ul>
+<p><img alt="Application monitoring diagram" src="../img/application_monitoring_diag.png" /></p>
 <h2 id="step-1-open-the-dynatrace-ui">Step 1 — Open the Dynatrace UI<a class="headerlink" href="#step-1-open-the-dynatrace-ui" title="Permanent link">#</a></h2>
 <p>Normally you would navigate to:</p>
 <p><strong>Infrastructure → Kubernetes → Connect cluster</strong></p>
