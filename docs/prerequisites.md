@@ -29,15 +29,23 @@ explanation: "Cluster node is Ready — you are good to proceed."
 
 The TODO application should already be deployed in the `todoapp` namespace by the environment setup script.
 
+### 2.1 Verify in the terminal
+
+On the navigation bar, above you'll find a button to start a new shell and connect to the training environment. Open it and type the following command:
+
 ```bash
 kubectl get pods -n todoapp
 ```
 
 Expected output: one or more pods with status `Running`.
 
-![todoapp](img/todoapp.png) 
+### 2.1 Verify in the browser
 
 You can open the app in the navigation tab "Apps". Once it's registered you'll be able to open the app so you can interact with it.
+
+
+![todoapp](img/todoapp.png) 
+
 
 <!-- LAB_QUESTION
 type: shell-verification
