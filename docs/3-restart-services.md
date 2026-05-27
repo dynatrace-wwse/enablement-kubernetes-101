@@ -85,7 +85,7 @@ Now that the application is instrumented, use the Dynatrace Services App to see 
 
 Answer the following questions to complete the training.
 
-<!-- boundScenarioId: k8s-101-fundamentals -->
+<!-- boundScenarioId: k8s-101-fundamentals retake=false -->
 
 !!! success "Training complete!"
     Your cluster is now fully instrumented with Dynatrace. Head to **Services**, **Kubernetes**, and **Distributed Traces** in your tenant to explore the data being collected.
