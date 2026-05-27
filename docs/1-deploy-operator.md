@@ -5,6 +5,8 @@ The **Dynatrace Operator** is a Kubernetes operator that manages the full lifecy
 
 ## How it works
 
+The [Dynatrace Operator](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment) is the central control plane for all Dynatrace monitoring inside Kubernetes. It follows the [operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) — a custom controller that watches for [`DynaKube`](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/reference/dynakube) custom resources and reconciles the cluster state to match your desired monitoring configuration.
+
 ```
 kubectl apply DynaKube CR
        │
@@ -16,7 +18,17 @@ Dynatrace Operator (watches CRDs)
        └─► ActiveGate          → routes data to your Dynatrace tenant
 ```
 
-In **AppOnly** mode (used in this lab), the operator does **not** run a OneAgent DaemonSet on every node. Instead, it uses a CSI driver and a mutating webhook to inject the Dynatrace agent library directly into application pod file systems at startup — no node-level privileges required.
+In [**Application-only monitoring**](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/guides/operation/configuration/application-only) mode (used in this lab), the operator does **not** run a OneAgent DaemonSet on every node. Instead, it uses a [CSI driver](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/guides/operation/csi-driver) and a [mutating webhook](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/guides/operation/webhook) to inject the Dynatrace agent library directly into application pod file systems at startup — no node-level privileges required.
+
+
+### When you deploy the Dynatrace Operator
+
+The following resources will be deployed by default in your cluster:
+
+- **[Dynatrace Operator](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment)** — manages the automated rollout, configuration, and lifecycle of Dynatrace components in your Kubernetes environment.
+- **[Dynatrace Webhook](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/guides/operation/webhook)** — validates DynaKube definitions, converts definitions with older API versions, and injects configurations into Pods.
+- **[Dynatrace CSI Driver](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/guides/operation/csi-driver)** — optional, deployed as a DaemonSet, provides writable volume storage for OneAgent binaries to minimize network and storage usage.
+
 
 ## Step 1 — Create the dynatrace namespace
 
@@ -41,6 +53,9 @@ helm install dynatrace-operator dynatrace/dynatrace-operator \
 
 !!! note "Verify the install"
     After the command returns, run `kubectl get pods -n dynatrace` to see the operator manager pod in `Running` state.
+
+
+
 
 ## Validation
 
