@@ -46,9 +46,9 @@ explanation: "OneAgent injected — the todoapp pods have the `oneagent.dynatrac
 
 Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by opening the TODO app and creating a new item, then verify it appears in Dynatrace Notebooks.
 
-Open DT Notebooks and run this DQL to explore your logs:
+Run this DQL query directly to explore your logs:
 
-```
+```dql
 fetch logs
 | filter k8s.namespace.name == "todoapp"
 | filter contains(content, "Adding a new todo: ")
