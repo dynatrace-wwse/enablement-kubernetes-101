@@ -2,8 +2,7 @@
 
 In this hands-on training you will instrument a live Kubernetes cluster with Dynatrace from scratch. The cluster and a demo application are already running in your environment. Your job is to deploy the Dynatrace Operator, configure observability via a DynaKube custom resource, and restart the application so Dynatrace can begin collecting metrics, traces, and logs automatically.
 
-
-TODO: Add a public Kubernetes short video that can be played in the app. It will be later replaced with a video of myself welcoming the user to the experience.
+[hs-video](https://www.youtube.com/watch?v=X48VuDVv0do%7CKubernetes Tutorial for Beginners%7CNot familiar with Kubernetes yet? This comprehensive intro by TechWorld with Nana covers pods, services, deployments, and everything you will see in this lab. Will be replaced with a personalised welcome video.)
 
 ## What you will do
 

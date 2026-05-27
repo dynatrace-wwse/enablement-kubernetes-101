@@ -26,38 +26,38 @@ When the rollout finishes, the new pods will have been started with OneAgent alr
 
 Open your Dynatrace tenant and navigate to **Services** or **Kubernetes** — within a few minutes you should see the `todoapp` service and its processes appearing automatically, with distributed traces flowing in.
 
-## Validation
+## Validation — OneAgent injected
 
-TODO: To verify that the todoapp has injection of Dynatrace, check the annotations of the pod of the todoapp, verify i it contains the annotation "oneagent.dynatrace.com/injected: true". 
+The check below verifies that the restarted pods have the `oneagent.dynatrace.com/injected: "true"` annotation set by the mutating webhook. This annotation is the definitive proof that the agent was successfully injected at pod startup.
 
 <!-- LAB_QUESTION
 type: shell-verification
-question: "Verify the todoapp pods are Running after the restart"
-buttonText: "Check Application Pods"
-command: "kubectl get pods -n todoapp --no-headers 2>/dev/null | grep -c Running"
+question: "Verify OneAgent was injected into the todoapp pods"
+buttonText: "Check Injection"
+command: "kubectl get pods -n todoapp -o jsonpath='{.items[*].metadata.annotations.oneagent\\.dynatrace\\.com/injected}' 2>/dev/null | tr ' ' '\\n' | grep -c true"
 expect:
   operator: gt
   value: 0
-hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab, then wait for the rollout to complete."
-explanation: "Application pods are Running — OneAgent has been injected and instrumentation is active."
+hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab, then wait for the rollout to complete. The injection annotation is only set on pods started after the DynaKube was applied."
+explanation: "OneAgent injected — the todoapp pods have the `oneagent.dynatrace.com/injected: true` annotation confirming agent injection at startup."
 -->
 
 ## Verify logs in Dynatrace
 
-Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by creating a TODO item in the application, then verify it appears in Dynatrace.
+Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by opening the TODO app and creating a new item, then verify it appears in Dynatrace Notebooks.
 
+Open DT Notebooks and run this DQL to explore your logs:
 
-TODO:  I want that the user can run DQLs in the app/lab and we can prefill them. Like the one below. Like if it was in a notebook.
-
-```dql
-dql: |
-  fetch logs
-  | filter k8s.namespace.name == "todoapp"
-  | filter contains(content, "Adding a new todo: ")
-  | limit 1
+```
+fetch logs
+| filter k8s.namespace.name == "todoapp"
+| filter contains(content, "Adding a new todo: ")
+| filter timestamp > now() - 10m
+| limit 5
 ```
 
-TODO: Here we add variables, either we add one for the clusterId where we adapt the filter with the clusterId to be sure is only from this training and not from another, or we add the startup time of the training or add that least the last 10 minutes, I want a report how the implementation is done. Simple and easy.
+!!! tip "Time filter"
+    The query uses `filter timestamp > now() - 10m` to show only logs from the last 10 minutes. This ensures you see logs from **your** training session and not from previous runs.
 
 <!-- LAB_QUESTION
 type: dql-verification
@@ -67,6 +67,7 @@ dql: |
   fetch logs
   | filter k8s.namespace.name == "todoapp"
   | filter contains(content, "Adding a new todo: ")
+  | filter timestamp > now() - 10m
   | limit 1
 expect:
   operator: not-empty
@@ -74,15 +75,15 @@ hint: "Open the TODO app, create a new item, then wait 1–2 minutes for logs to
 explanation: "Dynatrace is collecting logs from todoapp — full observability is active."
 -->
 
+## Explore your services in Dynatrace
 
-TODO: Similar to the Kubernetes App, we add a button for the Services of the cluster, where we have {app.services/cluster.id} /ui/apps/dynatrace.services/, for the cluster with the kubernetes-101 name is the link /ui/apps/dynatrace.services/explorer/services?perspective=performance&sort=healthIndicators%3Adescending#filtering=k8s.cluster.name+%3D+enablement-kubernetes-101  
+Now that the application is instrumented, use the Dynatrace Services App to see the automatically discovered services, performance indicators, and distributed traces from the `todoapp` namespace.
+
+[dt-app|dynatrace.services|Open Services App](placeholder)
 
 ## Knowledge check
 
 Answer the following questions to complete the training.
-
-
-TODO: adapt the questions and answers of the k8s-fundamentals to be easy, in regards of kubernetes and dynatrace with application monitoring, you find them in the .assesment folder. 
 
 <!-- boundScenarioId: k8s-101-fundamentals -->
 

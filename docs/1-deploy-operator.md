@@ -1,7 +1,7 @@
 
 # Section 1 — Deploy the Dynatrace Operator
 
-The **Dynatrace Operator** is a Kubernetes operator that manages the full lifecycle of Dynatrace monitoring components inside your cluster. It watches for `DynaKube` custom resources and automatically provisions OneAgent DaemonSets and ActiveGate deployments to match the desired monitoring configuration.
+The **Dynatrace Operator** is a Kubernetes operator that manages the full lifecycle of Dynatrace monitoring components inside your cluster. It watches for `DynaKube` custom resources and automatically provisions the monitoring configuration that matches your desired mode.
 
 ## How it works
 
@@ -11,11 +11,12 @@ kubectl apply DynaKube CR
        ▼
 Dynatrace Operator (watches CRDs)
        │
-       ├─► OneAgent DaemonSet  → runs on every node, instruments processes (CloudNativeFullStack only)
+       ├─► CSI Driver          → mounts code modules into application pods
+       ├─► Mutating Webhook    → intercepts new pods and injects the agent
        └─► ActiveGate          → routes data to your Dynatrace tenant
-       └─► Webhooks            → Mutate pods before scheduling with init containers
-       └─► CSI Driver          → manages loading of codemodules and images
 ```
+
+In **AppOnly** mode (used in this lab), the operator does **not** run a OneAgent DaemonSet on every node. Instead, it uses a CSI driver and a mutating webhook to inject the Dynatrace agent library directly into application pod file systems at startup — no node-level privileges required.
 
 ## Step 1 — Create the dynatrace namespace
 
@@ -53,19 +54,18 @@ command: "kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -c Runni
 expect:
   operator: gt
   value: 0
-hint: "Run the three Helm commands above in the Terminal tab. The `--atomic` flag will wait until the pod is ready."
+hint: "Run the three Helm commands above in the Terminal tab. Wait a few seconds for the operator pod to reach Running state."
 explanation: "Operator manager pod is Running — ready to deploy the DynaKube."
 -->
 
-TODO: Change this question, we are not deploying a CNFS, but AppOnly. So we deploy CSI Driver, Operator and Webhook. Think of a question for AppOnly. 
 <!-- LAB_QUESTION
 type: multiple-choice
-question: "What does the Dynatrace Operator deploy by default with no Dynakube?"
+question: "With AppOnly mode, the Dynatrace Operator does NOT run a OneAgent DaemonSet on every node. What does it use instead to instrument your application pods?"
 options:
-  - "A CSI Driver, the Dynatrace Operator and two Dynatrace Webhooks for resilience"
-  - "A OneAgent DaemonSet so every node is automatically instrumented"
-  - "A standalone Prometheus exporter that scrapes metrics"
-  - "A second Kubernetes API server for high availability"
+  - "A CSI driver that mounts code modules into each pod, combined with a mutating webhook that injects the agent at startup"
+  - "A OneAgent DaemonSet that runs on every node and instruments all processes"
+  - "Manual sidecar injection — the developer must add an init container to every pod YAML"
+  - "A Prometheus exporter sidecar that is automatically added to every pod"
 correct: 0
-explanation: "The operator reconciles DynaKube CRs and rolls out a OneAgent DaemonSet — one agent pod per node — ensuring full cluster coverage without manual sidecar injection."
+explanation: "AppOnly uses a CSI driver (for code module delivery) and a mutating webhook (for automatic injection at pod creation). No kernel-level DaemonSet is needed, making it suitable for restricted environments."
 -->

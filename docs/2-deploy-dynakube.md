@@ -36,9 +36,9 @@ kubectl apply -f /workspaces/enablement-kubernetes-101/.devcontainer/yaml/gen/dy
 !!! tip "Tenant credentials are pre-loaded"
     Your environment already has `DT_ENVIRONMENT`, `DT_OPERATOR_TOKEN`, and `DT_INGEST_TOKEN` set. The Dynatrace wizard will detect your tenant from these variables if you are signed in.
 
-## Step 3 — Wait for OneAgent pods
+## Step 3 — Wait for ActiveGate and pods
 
-After applying the DynaKube, the operator provisions a OneAgent DaemonSet. On a single-node cluster, one OneAgent pod will start.
+After applying the DynaKube, the operator provisions an ActiveGate pod and the CSI driver. On a single-node cluster, the ActiveGate pod will start first, followed by the CSI components.
 
 ```bash
 kubectl get pods -n dynatrace --watch
@@ -60,21 +60,22 @@ hint: "Apply the manifests from the Dynatrace UI wizard. The DynaKube CR must ex
 explanation: "DynaKube CR is present — the operator will now provision monitoring components."
 -->
 
-## Validation — ActiveGate pods are Running
-
-TODO: Change this to verify the ActiveGate por is ready and running. It contains in the nage activegate and should be running.
+## Validation — ActiveGate is Running
 
 <!-- LAB_QUESTION
 type: shell-verification
-question: "Verify the OneAgent DaemonSet pods are Running"
-buttonText: "Check OneAgent Pods"
-command: "kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -c Running"
+question: "Verify the ActiveGate pod is Running in the dynatrace namespace"
+buttonText: "Check ActiveGate"
+command: "kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -i activegate | grep -c Running"
 expect:
   operator: gt
-  value: 1
-hint: "The OneAgent DaemonSet pod may take 1–2 minutes to start after the DynaKube is applied. Run `kubectl get pods -n dynatrace --watch` to monitor."
-explanation: "OneAgent is running — your cluster nodes are now being instrumented."
+  value: 0
+hint: "The ActiveGate pod may take 1–2 minutes to start after the DynaKube is applied. Run `kubectl get pods -n dynatrace --watch` to monitor progress."
+explanation: "ActiveGate is Running — your cluster is connected to the Dynatrace tenant and data will start flowing."
 -->
 
+## Explore your cluster in Dynatrace
 
-TODO: We tell the user that he can open the kubernetes cluster directly from heren, we can add a button to open in a new tab the kubernetes app, we need a way to make this dynamic like { app.kubernetes } that opens the ui/apps/dynatrace.kubernetes. 
+Once the ActiveGate is running, your cluster is visible in the Dynatrace Kubernetes app. Open it to see live cluster topology, node health, and workload status.
+
+[dt-app|dynatrace.kubernetes|Open Kubernetes App](placeholder)
