@@ -13,14 +13,15 @@ The **DynaKube** is a Kubernetes Custom Resource that tells the Dynatrace Operat
 
 ## How it works
 
-The [**DynaKube**](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/reference/dynakube) custom resource is the single source of truth for how Dynatrace monitors your cluster. It tells the operator which [monitoring mode](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/guides/operation/configuration) to use, which tenant to connect to, and which optional components to enable.
+The [**DynaKube**](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/reference/dynakube-parameters) custom resource is the single source of truth for how Dynatrace monitors your cluster. It tells the operator which [monitoring mode](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/guides/operation/configuration) to use, which tenant to connect to, and which optional components to enable.
 
 ### When you deploy the DynaKube with Application Observability in this scenario
 
-- **[ActiveGate](https://docs.dynatrace.com/docs/manage/activegate)** — routes observability data from your cluster to the Dynatrace tenant, acting as a secure proxy.
+- **[ActiveGate](https://docs.dynatrace.com/docs/ingest-from/dynatrace-activegate)** — routes observability data from your cluster to the Dynatrace tenant, acting as a secure proxy.
 - **[Code Modules](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/guides/operation/configuration/application-only)** — injected into your application pods via the CSI driver to enable deep code-level monitoring and observability.
-- **[OpenTelemetry Collector](https://docs.dynatrace.com/docs/extend-dynatrace/opentelemetry/collector/deployment)** — deployed to collect and forward OpenTelemetry signals (traces, metrics, logs) to Dynatrace.
-- **[Log Monitoring Module](https://docs.dynatrace.com/docs/observe-and-explore/logs/log-monitoring)** — deployed to capture and ingest container and application logs.
+- **[OpenTelemetry Collector](https://docs.dynatrace.com/docs/ingest-from/opentelemetry/collector/configuration)** — deployed to collect and forward OpenTelemetry signals (traces, metrics, logs) to Dynatrace.
+- **[Log Monitoring Module](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment/k8s-log-monitoring)** — deployed to capture and ingest container and application logs.
+
 
 
 ![Application monitoring diagram](img/application_monitoring_diag.png)
