@@ -1,3 +1,13 @@
+---
+description: Instrument a live Kubernetes cluster with Dynatrace from scratch — deploy the Operator, configure a DynaKube, and observe full-stack metrics, traces, and logs.
+tags:
+  - kubernetes
+  - observability
+  - operator
+difficulty: beginner
+duration: 90
+---
+
 # Kubernetes 101 — Dynatrace Application Observability
 
 In this hands-on training you will instrument a live Kubernetes cluster with Dynatrace from scratch. The cluster and a demo application are already running in your environment. Your job is to deploy the Dynatrace Operator, configure observability via a DynaKube custom resource, and restart the application so Dynatrace can begin collecting metrics, traces, and logs automatically.
