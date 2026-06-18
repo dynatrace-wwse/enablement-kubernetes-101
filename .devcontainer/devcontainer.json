@@ -21,13 +21,10 @@
 
   "postStartCommand": "./.devcontainer/post-start.sh",
   
-  // sshd feature: installs + configures an SSH server with the GitHub-managed
-  // authorized key so `gh codespace ssh` (the Enablement App terminal relay) can
-  // attach. A bare apt-install in post-create is NOT enough — GitHub needs the
-  // feature's keyed setup. (Test branch; framework default keeps features empty.)
-  "features": {
-    "ghcr.io/devcontainers/features/sshd:1": {}
-  },
+  // Framework default: no features (portability). SSH for `gh codespace ssh` is
+  // installed dynamically by the sshd() function in util/my_functions.sh, called
+  // from post-create.sh — testing whether the on-demand approach is sufficient.
+  "features": {},
   "customizations": {
     "vscode": {
       // Set container specific settings
