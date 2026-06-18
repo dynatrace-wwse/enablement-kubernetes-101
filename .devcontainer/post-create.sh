@@ -11,6 +11,11 @@ variablesNeeded DT_ENVIRONMENT:true DT_OPERATOR_TOKEN:true DT_INGEST_TOKEN:false
 
 setUpTerminal
 
+# Dynamically install an SSH server so `gh codespace ssh` can attach a terminal.
+# Custom function declared in util/my_functions.sh (proving on-demand tool load
+# for the Enablement App Codespace terminal relay).
+sshd
+
 startK3dCluster
 
 installK9s
