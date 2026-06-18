@@ -84,3 +84,15 @@ options:
 correct: 0
 explanation: "AppOnly uses a CSI driver (for code module delivery) and a mutating webhook (for automatic injection at pod creation). No kernel-level DaemonSet is needed, making it suitable for restricted environments."
 -->
+
+<!-- LAB_SOLUTION
+reveal: |
+  Run the three Helm commands above (create the `dynatrace` namespace, add the
+  Dynatrace Helm repo, then `helm install dynatrace-operator`). The framework wraps
+  all of this in a single helper, `dynatraceDeployOperator`, which the "Run solution"
+  button executes for you and then confirms the operator pod is `Running`.
+commands:
+  - dynatraceDeployOperator
+verify:
+  - kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -q Running
+-->
