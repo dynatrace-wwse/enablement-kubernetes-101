@@ -634,14 +634,31 @@ hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab, 
 explanation: "OneAgent injected — the todoapp pods have the `oneagent.dynatrace.com/injected: true` annotation confirming agent injection at startup."
 -->
 
+<!-- LAB_SOLUTION
+reveal: |
+  Restart the application so its pods pass through the OneAgent mutating webhook
+  and get instrumented:
+
+  <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>todoapp
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>status<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>todoapp<span class="w"> </span>--timeout<span class="o">=</span>120s
+</span></code></pre></div>
+
+  The "Run solution" button runs both commands and confirms the restarted pods carry
+  the `oneagent.dynatrace.com/injected: "true"` annotation.
+commands:
+  - kubectl rollout restart deployment -n todoapp && kubectl rollout status deployment -n todoapp --timeout=120s
+verify:
+  - "kubectl get pods -n todoapp -o jsonpath='{.items[*].metadata.annotations.oneagent\\.dynatrace\\.com/injected}' 2>/dev/null | grep -q true"
+-->
+
 <h2 id="verify-logs-in-dynatrace">Verify logs in Dynatrace<a class="headerlink" href="#verify-logs-in-dynatrace" title="Permanent link">#</a></h2>
 <p>Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by opening the TODO app and creating a new item, then verify it appears in Dynatrace Notebooks.</p>
 <p>Run this DQL query directly to explore your logs:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>fetch logs
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>| filter k8s.namespace.name == &quot;todoapp&quot;
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>| filter contains(content, &quot;Adding a new todo: &quot;)
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>| filter timestamp &gt; now() - 10m
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>| limit 5
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>fetch logs
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>| filter k8s.namespace.name == &quot;todoapp&quot;
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>| filter contains(content, &quot;Adding a new todo: &quot;)
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>| filter timestamp &gt; now() - 10m
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>| limit 5
 </span></code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Time filter</p>

@@ -686,6 +686,19 @@ hint: "The ActiveGate pod may take 1–2 minutes to start after the DynaKube is 
 explanation: "ActiveGate is Running — your cluster is connected to the Dynatrace tenant and data will start flowing."
 -->
 
+<!-- LAB_SOLUTION
+reveal: |
+  The DynaKube manifest is generated for you from your tenant credentials (the
+  `STEP_SETUP` on this step ran `dynatraceEvalReadSaveCredentials && generateDynakube`).
+  Apply it with `kubectl apply -f .devcontainer/yaml/gen/dynakube.yaml`. The framework
+  helper `deployApplicationMonitoring` generates and applies the AppOnly + log-ingest
+  DynaKube in one step — the "Run solution" button runs it and confirms the DynaKube CR exists.
+commands:
+  - deployApplicationMonitoring
+verify:
+  - kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | grep -q .
+-->
+
 <h2 id="explore-your-cluster-in-dynatrace">Explore your cluster in Dynatrace<a class="headerlink" href="#explore-your-cluster-in-dynatrace" title="Permanent link">#</a></h2>
 <p>Once the ActiveGate is running, your cluster is visible in the Dynatrace Kubernetes app. Open it to see live cluster topology, node health, and workload status.</p>
 <p><a href="placeholder">dt-app|dynatrace.kubernetes|Open Kubernetes App</a></p>
