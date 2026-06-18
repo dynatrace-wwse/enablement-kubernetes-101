@@ -42,6 +42,24 @@ hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab, 
 explanation: "OneAgent injected — the todoapp pods have the `oneagent.dynatrace.com/injected: true` annotation confirming agent injection at startup."
 -->
 
+<!-- LAB_SOLUTION
+reveal: |
+  Restart the application so its pods pass through the OneAgent mutating webhook
+  and get instrumented:
+
+  ```bash
+  kubectl rollout restart deployment -n todoapp
+  kubectl rollout status deployment -n todoapp --timeout=120s
+  ```
+
+  The "Run solution" button runs both commands and confirms the restarted pods carry
+  the `oneagent.dynatrace.com/injected: "true"` annotation.
+commands:
+  - kubectl rollout restart deployment -n todoapp && kubectl rollout status deployment -n todoapp --timeout=120s
+verify:
+  - "kubectl get pods -n todoapp -o jsonpath='{.items[*].metadata.annotations.oneagent\\.dynatrace\\.com/injected}' 2>/dev/null | grep -q true"
+-->
+
 ## Verify logs in Dynatrace
 
 Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by opening the TODO app and creating a new item, then verify it appears in Dynatrace Notebooks.
