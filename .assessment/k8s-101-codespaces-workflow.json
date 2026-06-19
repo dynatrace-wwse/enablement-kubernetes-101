@@ -37,7 +37,6 @@
       },
       "buttonText": "Validate",
       "explanation": "Dynatrace discovered the todoapp namespace automatically via the OneAgent DaemonSet. The entity type `dt.entity.cloud_application_namespace` represents every Kubernetes namespace Dynatrace monitors.",
-      "points": 1500,
       "hints": [
         "Navigate to Kubernetes in the Dynatrace menu to visually confirm namespaces are visible",
         "The query uses matchesPhrase \u2014 both \"todoapp\" and similar names will satisfy the check"
@@ -76,7 +75,6 @@
       ],
       "correctAnswer": "b",
       "explanation": "The devcontainer lifecycle has distinct hooks: postCreateCommand (once on creation), postStartCommand (on each start), and postAttachCommand (on each VS Code attach).",
-      "points": 1000,
       "hints": [
         "Think about what 'create' means in the Codespace lifecycle vs 'start'.",
         "post-create is for one-time setup (install tools, deploy apps); post-start is for recurring tasks."
@@ -115,14 +113,12 @@
       ],
       "correctAnswer": "b",
       "explanation": "GitHub Codespaces ports default to 'private' (only the Codespace owner can access). Changing to 'public' in the Ports tab makes the forwarded URL accessible to anyone with the link.",
-      "points": 1000,
       "hints": [
         "The lab page mentions 'go to the ports section in VSCode, right click on them'.",
         "This is a Codespaces platform feature, not a Kubernetes feature."
       ]
     }
   ],
-  "maxScore": 3500,
   "tags": [
     "codespaces",
     "devcontainer",
