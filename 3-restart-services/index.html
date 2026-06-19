@@ -436,11 +436,35 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verify-logs-in-dynatrace" class="md-nav__link">
+  <a href="#verify-logs-reach-grail-end-to-end" class="md-nav__link">
     <span class="md-ellipsis">
-      Verify logs in Dynatrace
+      Verify logs reach Grail (end-to-end)
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Verify logs reach Grail (end-to-end)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-generate-a-uniquely-tagged-log-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1 — Generate a uniquely-tagged log line
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-confirm-the-tagged-log-arrived-in-grail" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2 — Confirm the tagged log arrived in Grail
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -562,11 +586,35 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verify-logs-in-dynatrace" class="md-nav__link">
+  <a href="#verify-logs-reach-grail-end-to-end" class="md-nav__link">
     <span class="md-ellipsis">
-      Verify logs in Dynatrace
+      Verify logs reach Grail (end-to-end)
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Verify logs reach Grail (end-to-end)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-generate-a-uniquely-tagged-log-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1 — Generate a uniquely-tagged log line
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-confirm-the-tagged-log-arrived-in-grail" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2 — Confirm the tagged log arrived in Grail
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -626,11 +674,10 @@
 type: shell-verification
 question: "Verify OneAgent was injected into the todoapp pods"
 buttonText: "Check Injection"
-command: "kubectl get pods -n todoapp -o jsonpath='{.items[*].metadata.annotations.oneagent\\.dynatrace\\.com/injected}' 2>/dev/null | tr ' ' '\\n' | grep -c true"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && waitForOneAgentInjected"
 expect:
-  operator: gt
-  value: 0
-hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab, then wait for the rollout to complete. The injection annotation is only set on pods started after the DynaKube was applied."
+  operator: exit-zero
+hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab. The check waits up to ~4 min for the `oneagent.dynatrace.com/injected: true` annotation on the restarted pods."
 explanation: "OneAgent injected — the todoapp pods have the `oneagent.dynatrace.com/injected: true` annotation confirming agent injection at startup."
 -->
 
@@ -648,38 +695,52 @@ reveal: |
 commands:
   - kubectl rollout restart deployment -n todoapp && kubectl rollout status deployment -n todoapp --timeout=120s
 verify:
-  - "kubectl get pods -n todoapp -o jsonpath='{.items[*].metadata.annotations.oneagent\\.dynatrace\\.com/injected}' 2>/dev/null | grep -q true"
+  - "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && waitForOneAgentInjected"
 -->
 
-<h2 id="verify-logs-in-dynatrace">Verify logs in Dynatrace<a class="headerlink" href="#verify-logs-in-dynatrace" title="Permanent link">#</a></h2>
-<p>Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by opening the TODO app and creating a new item, then verify it appears in Dynatrace Notebooks.</p>
-<p>Run this DQL query directly to explore your logs:</p>
+<h2 id="verify-logs-reach-grail-end-to-end">Verify logs reach Grail (end-to-end)<a class="headerlink" href="#verify-logs-reach-grail-end-to-end" title="Permanent link">#</a></h2>
+<p>This is the real end-to-end signal: app → OneAgent → Dynatrace Grail. We generate a <strong>uniquely-tagged</strong> TODO via the app's HTTP API, then confirm <em>that specific</em> log line arrives in Grail — so no other todo activity (or a previous run) can give a false pass.</p>
+<h3 id="step-1-generate-a-uniquely-tagged-log-line">Step 1 — Generate a uniquely-tagged log line<a class="headerlink" href="#step-1-generate-a-uniquely-tagged-log-line" title="Permanent link">#</a></h3>
+<p><code>generateTodoTraffic</code> waits for the app's HTTP endpoint to answer, then creates a TODO whose title carries the tag <code>K8S101LOGPROBE</code> plus a per-run nonce (the same CURL path the Live Debugger lab uses to add a task). The app logs the title, so the tag lands in the log content.</p>
+<!-- LAB_QUESTION
+type: shell-verification
+question: "Generate a uniquely-tagged TODO so we can verify its log reaches Grail"
+buttonText: "Generate tagged log"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && generateTodoTraffic"
+expect:
+  operator: exit-zero
+hint: "Needs OneAgent injected (previous step) and the todoapp reachable via the ingress. The check waits for the endpoint, then POSTs the tagged TODO."
+explanation: "A uniquely-tagged TODO was created — its log line should reach Grail within ~2 minutes."
+-->
+
+<h3 id="step-2-confirm-the-tagged-log-arrived-in-grail">Step 2 — Confirm the tagged log arrived in Grail<a class="headerlink" href="#step-2-confirm-the-tagged-log-arrived-in-grail" title="Permanent link">#</a></h3>
+<p>This DQL matches <strong>only</strong> the tagged probe log from the last 15 minutes — generic <code>Adding a new todo</code> logs and older runs are filtered out. The check button retries while the log makes its way to Grail.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>fetch logs
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>| filter k8s.namespace.name == &quot;todoapp&quot;
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>| filter contains(content, &quot;Adding a new todo: &quot;)
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>| filter timestamp &gt; now() - 10m
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>| filter contains(content, &quot;K8S101LOGPROBE&quot;)
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>| filter timestamp &gt; now() - 15m
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>| limit 5
 </span></code></pre></div>
-<div class="admonition tip">
-<p class="admonition-title">Time filter</p>
-<p>The query uses <code>filter timestamp &gt; now() - 10m</code> to show only logs from the last 10 minutes. This ensures you see logs from <strong>your</strong> training session and not from previous runs.</p>
-</div>
 <!-- LAB_QUESTION
 type: dql-verification
-question: "Verify Dynatrace is collecting logs from the todoapp namespace"
-buttonText: "Check DT Logs"
+question: "Verify the uniquely-tagged TODO log reached Dynatrace Grail"
+buttonText: "Check tagged log in Grail"
 dql: |
   fetch logs
   | filter k8s.namespace.name == "todoapp"
-  | filter contains(content, "Adding a new todo: ")
-  | filter timestamp > now() - 10m
+  | filter contains(content, "K8S101LOGPROBE")
+  | filter timestamp > now() - 15m
   | limit 1
 expect:
   operator: not-empty
-hint: "Open the TODO app, create a new item, then wait 1–2 minutes for logs to appear in Dynatrace."
-explanation: "Dynatrace is collecting logs from todoapp — full observability is active."
+hint: "Run the previous step first. Logs take ~1–2 minutes to reach Grail — the check retries, so give it a moment."
+explanation: "The tagged log reached Grail — the full app → OneAgent → Grail pipeline is verified end-to-end."
 -->
 
+<div class="admonition tip">
+<p class="admonition-title">Why the tag</p>
+<p>Matching <code>K8S101LOGPROBE</code> (a probe-only marker) instead of the generic <code>Adding a new todo</code> guarantees the log came from <strong>this</strong> verification step, and the <code>now() - 15m</code> window keeps a previous run from giving a false pass.</p>
+</div>
 <h2 id="explore-your-services-in-dynatrace">Explore your services in Dynatrace<a class="headerlink" href="#explore-your-services-in-dynatrace" title="Permanent link">#</a></h2>
 <p>Now that the application is instrumented, use the Dynatrace Services App to see the automatically discovered services, performance indicators, and distributed traces from the <code>todoapp</code> namespace.</p>
 <p><a href="placeholder">dt-app|dynatrace.services|Open Services App</a></p>

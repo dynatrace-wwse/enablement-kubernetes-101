@@ -625,11 +625,10 @@
 type: shell-verification
 question: "Verify the Dynatrace Operator is running in the dynatrace namespace"
 buttonText: "Check Operator"
-command: "kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -c Running"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && waitForOperatorReady"
 expect:
-  operator: gt
-  value: 0
-hint: "Run the three Helm commands above in the Terminal tab. Wait a few seconds for the operator pod to reach Running state."
+  operator: exit-zero
+hint: "Run the three Helm commands above in the Terminal tab. The check waits up to ~180s for the operator pod to reach Running."
 explanation: "Operator manager pod is Running — ready to deploy the DynaKube."
 -->
 
