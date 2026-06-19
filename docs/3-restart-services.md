@@ -34,11 +34,10 @@ The check below verifies that the restarted pods have the `oneagent.dynatrace.co
 type: shell-verification
 question: "Verify OneAgent was injected into the todoapp pods"
 buttonText: "Check Injection"
-command: "kubectl get pods -n todoapp -o jsonpath='{.items[*].metadata.annotations.oneagent\\.dynatrace\\.com/injected}' 2>/dev/null | tr ' ' '\\n' | grep -c true"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && waitForOneAgentInjected"
 expect:
-  operator: gt
-  value: 0
-hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab, then wait for the rollout to complete. The injection annotation is only set on pods started after the DynaKube was applied."
+  operator: exit-zero
+hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab. The check waits up to ~4 min for the `oneagent.dynatrace.com/injected: true` annotation on the restarted pods."
 explanation: "OneAgent injected — the todoapp pods have the `oneagent.dynatrace.com/injected: true` annotation confirming agent injection at startup."
 -->
 
@@ -57,41 +56,58 @@ reveal: |
 commands:
   - kubectl rollout restart deployment -n todoapp && kubectl rollout status deployment -n todoapp --timeout=120s
 verify:
-  - "kubectl get pods -n todoapp -o jsonpath='{.items[*].metadata.annotations.oneagent\\.dynatrace\\.com/injected}' 2>/dev/null | grep -q true"
+  - "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && waitForOneAgentInjected"
 -->
 
-## Verify logs in Dynatrace
+## Verify logs reach Grail (end-to-end)
 
-Once OneAgent is injected and the services are running, Dynatrace will start collecting logs automatically. Trigger a log entry by opening the TODO app and creating a new item, then verify it appears in Dynatrace Notebooks.
+This is the real end-to-end signal: app → OneAgent → Dynatrace Grail. We generate a **uniquely-tagged** TODO via the app's HTTP API, then confirm *that specific* log line arrives in Grail — so no other todo activity (or a previous run) can give a false pass.
 
-Run this DQL query directly to explore your logs:
+### Step 1 — Generate a uniquely-tagged log line
+
+`generateTodoTraffic` waits for the app's HTTP endpoint to answer, then creates a TODO whose title carries the tag `K8S101LOGPROBE` plus a per-run nonce (the same CURL path the Live Debugger lab uses to add a task). The app logs the title, so the tag lands in the log content.
+
+<!-- LAB_QUESTION
+type: shell-verification
+question: "Generate a uniquely-tagged TODO so we can verify its log reaches Grail"
+buttonText: "Generate tagged log"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && generateTodoTraffic"
+expect:
+  operator: exit-zero
+hint: "Needs OneAgent injected (previous step) and the todoapp reachable via the ingress. The check waits for the endpoint, then POSTs the tagged TODO."
+explanation: "A uniquely-tagged TODO was created — its log line should reach Grail within ~2 minutes."
+-->
+
+### Step 2 — Confirm the tagged log arrived in Grail
+
+This DQL matches **only** the tagged probe log from the last 15 minutes — generic `Adding a new todo` logs and older runs are filtered out. The check button retries while the log makes its way to Grail.
 
 ```dql
 fetch logs
 | filter k8s.namespace.name == "todoapp"
-| filter contains(content, "Adding a new todo: ")
-| filter timestamp > now() - 10m
+| filter contains(content, "K8S101LOGPROBE")
+| filter timestamp > now() - 15m
 | limit 5
 ```
 
-!!! tip "Time filter"
-    The query uses `filter timestamp > now() - 10m` to show only logs from the last 10 minutes. This ensures you see logs from **your** training session and not from previous runs.
-
 <!-- LAB_QUESTION
 type: dql-verification
-question: "Verify Dynatrace is collecting logs from the todoapp namespace"
-buttonText: "Check DT Logs"
+question: "Verify the uniquely-tagged TODO log reached Dynatrace Grail"
+buttonText: "Check tagged log in Grail"
 dql: |
   fetch logs
   | filter k8s.namespace.name == "todoapp"
-  | filter contains(content, "Adding a new todo: ")
-  | filter timestamp > now() - 10m
+  | filter contains(content, "K8S101LOGPROBE")
+  | filter timestamp > now() - 15m
   | limit 1
 expect:
   operator: not-empty
-hint: "Open the TODO app, create a new item, then wait 1–2 minutes for logs to appear in Dynatrace."
-explanation: "Dynatrace is collecting logs from todoapp — full observability is active."
+hint: "Run the previous step first. Logs take ~1–2 minutes to reach Grail — the check retries, so give it a moment."
+explanation: "The tagged log reached Grail — the full app → OneAgent → Grail pipeline is verified end-to-end."
 -->
+
+!!! tip "Why the tag"
+    Matching `K8S101LOGPROBE` (a probe-only marker) instead of the generic `Adding a new todo` guarantees the log came from **this** verification step, and the `now() - 15m` window keeps a previous run from giving a false pass.
 
 ## Explore your services in Dynatrace
 

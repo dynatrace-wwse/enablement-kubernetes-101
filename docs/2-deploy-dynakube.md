@@ -68,11 +68,10 @@ Wait until all pods show `Running` before continuing.
 type: shell-verification
 question: "Verify the DynaKube custom resource was created"
 buttonText: "Check DynaKube"
-command: "kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | grep -c ''"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && waitForDynakube"
 expect:
-  operator: gt
-  value: 0
-hint: "Apply the manifests from the Dynatrace UI wizard. The DynaKube CR must exist in the dynatrace namespace."
+  operator: exit-zero
+hint: "Apply the manifests from the Dynatrace UI wizard. The check waits up to ~150s for the DynaKube CR to appear in the dynatrace namespace."
 explanation: "DynaKube CR is present — the operator will now provision monitoring components."
 -->
 
@@ -82,11 +81,10 @@ explanation: "DynaKube CR is present — the operator will now provision monitor
 type: shell-verification
 question: "Verify the ActiveGate pod is Running in the dynatrace namespace"
 buttonText: "Check ActiveGate"
-command: "kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -i activegate | grep -c Running"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && waitForActiveGateReady"
 expect:
-  operator: gt
-  value: 0
-hint: "The ActiveGate pod may take 1–2 minutes to start after the DynaKube is applied. Run `kubectl get pods -n dynatrace --watch` to monitor progress."
+  operator: exit-zero
+hint: "The ActiveGate pod may take 1–2 minutes to start after the DynaKube is applied. The check waits up to ~6 min for it to reach Running."
 explanation: "ActiveGate is Running — your cluster is connected to the Dynatrace tenant and data will start flowing."
 -->
 
