@@ -2,7 +2,7 @@
   "templateVersion": "1.0.0",
   "id": "k8s-101-fundamentals",
   "category": "CO",
-  "title": "Kubernetes 101 — Fundamentals",
+  "title": "Kubernetes 101 \u2014 Fundamentals",
   "description": "Validate your understanding of Kubernetes and Dynatrace application monitoring as covered in this lab: pods, namespaces, kubectl, the Dynatrace Operator, and OneAgent injection.",
   "difficulty": "beginner",
   "estimatedTime": 8,
@@ -49,7 +49,7 @@
           "id": "c",
           "text": "A separate Kubernetes cluster running inside the main cluster",
           "isCorrect": false,
-          "explanation": "Namespaces share the same cluster control plane — they are not sub-clusters."
+          "explanation": "Namespaces share the same cluster control plane \u2014 they are not sub-clusters."
         },
         {
           "id": "d",
@@ -60,10 +60,9 @@
       ],
       "correctAnswer": "a",
       "explanation": "Kubernetes namespaces partition cluster resources into isolated groups. In this lab, all Dynatrace components lived in `dynatrace` and the TODO app lived in `todoapp`.",
-      "points": 800,
       "hints": [
         "Think about why `kubectl get pods -n dynatrace` and `kubectl get pods -n todoapp` return different results.",
-        "The key word is 'logical' — namespaces do not map to physical nodes."
+        "The key word is 'logical' \u2014 namespaces do not map to physical nodes."
       ]
     },
     {
@@ -82,7 +81,7 @@
           "id": "b",
           "text": "kubectl list pods --namespace=todoapp",
           "isCorrect": false,
-          "explanation": "'list' is not a kubectl verb — use 'get'."
+          "explanation": "'list' is not a kubectl verb \u2014 use 'get'."
         },
         {
           "id": "c",
@@ -99,7 +98,6 @@
       ],
       "correctAnswer": "a",
       "explanation": "kubectl uses verb-noun syntax. 'get pods' lists pods; '-n <namespace>' scopes the query to that namespace.",
-      "points": 600,
       "hints": [
         "The verb you want is 'get'.",
         "Namespace flag is -n or --namespace."
@@ -133,12 +131,11 @@
           "id": "d",
           "text": "The TODO app needs to re-read the DT_ENVIRONMENT variable from a ConfigMap",
           "isCorrect": false,
-          "explanation": "Environment variables alone don't instrument an application — the agent library must be injected into the process."
+          "explanation": "Environment variables alone don't instrument an application \u2014 the agent library must be injected into the process."
         }
       ],
       "correctAnswer": "b",
       "explanation": "Dynatrace uses a Kubernetes mutating admission webhook. Webhooks run at pod creation time, so any pods that were already running when the DynaKube was applied need to be recycled before the agent is injected.",
-      "points": 1000,
       "hints": [
         "Think about when Kubernetes calls a mutating webhook.",
         "The annotation `oneagent.dynatrace.com/injected: true` is only present on pods that went through the webhook."
@@ -154,13 +151,13 @@
           "id": "a",
           "text": "It is the Kubernetes API server proxy that the operator uses to watch for CRD changes",
           "isCorrect": false,
-          "explanation": "The operator connects to the Kubernetes API server directly — the ActiveGate is not involved in that path."
+          "explanation": "The operator connects to the Kubernetes API server directly \u2014 the ActiveGate is not involved in that path."
         },
         {
           "id": "b",
           "text": "It acts as a secure communication gateway that routes monitoring data from OneAgent to your Dynatrace tenant",
           "isCorrect": true,
-          "explanation": "Correct! The ActiveGate is a local relay. OneAgent sends data to the ActiveGate, which forwards it to the Dynatrace SaaS backend — reducing direct outbound connections from each node."
+          "explanation": "Correct! The ActiveGate is a local relay. OneAgent sends data to the ActiveGate, which forwards it to the Dynatrace SaaS backend \u2014 reducing direct outbound connections from each node."
         },
         {
           "id": "c",
@@ -177,9 +174,8 @@
       ],
       "correctAnswer": "b",
       "explanation": "The ActiveGate is a local routing proxy. OneAgent on each instrumented pod communicates with the local ActiveGate, which then securely forwards all observability data to the Dynatrace SaaS tenant.",
-      "points": 1000,
       "hints": [
-        "Think about the data path: pod → ? → Dynatrace cloud.",
+        "Think about the data path: pod \u2192 ? \u2192 Dynatrace cloud.",
         "The ActiveGate sits between OneAgent and the Dynatrace backend."
       ]
     },
@@ -216,9 +212,8 @@
       ],
       "correctAnswer": "c",
       "explanation": "The DynaKube Custom Resource is the control plane for Dynatrace observability. It specifies tenant credentials reference, monitoring mode (AppOnly in this lab), and which components to provision. The operator watches DynaKube objects and reconciles the cluster to match.",
-      "points": 1000,
       "hints": [
-        "Think of the DynaKube like a deployment spec — it describes the desired state, and the operator makes it happen.",
+        "Think of the DynaKube like a deployment spec \u2014 it describes the desired state, and the operator makes it happen.",
         "It references the secret that holds your DT_OPERATOR_TOKEN."
       ]
     },
@@ -238,7 +233,7 @@
           "id": "b",
           "text": "Look for a new container named `oneagent` inside the pod",
           "isCorrect": false,
-          "explanation": "AppOnly mode uses init containers and a shared volume to inject code modules — it does not add a running sidecar container."
+          "explanation": "AppOnly mode uses init containers and a shared volume to inject code modules \u2014 it does not add a running sidecar container."
         },
         {
           "id": "c",
@@ -250,19 +245,17 @@
           "id": "d",
           "text": "The Dynatrace Operator logs will print 'injection complete' for each pod",
           "isCorrect": false,
-          "explanation": "The injection is handled by the mutating webhook, not the operator controller — and the evidence lives in the pod annotation."
+          "explanation": "The injection is handled by the mutating webhook, not the operator controller \u2014 and the evidence lives in the pod annotation."
         }
       ],
       "correctAnswer": "a",
       "explanation": "The annotation `oneagent.dynatrace.com/injected: \"true\"` is stamped by the Dynatrace mutating webhook at pod admission time. It is the canonical proof that the agent was injected. In this lab the shell validation used `kubectl get pods -n todoapp -o jsonpath=...` to check exactly this.",
-      "points": 1200,
       "hints": [
         "The lab's shell validation for Section 3 checked this exact annotation.",
         "Run `kubectl describe pod <pod-name> -n todoapp` and look at the Annotations section."
       ]
     }
   ],
-  "maxScore": 5600,
   "tags": [
     "kubernetes",
     "k8s",
