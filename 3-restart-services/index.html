@@ -715,11 +715,13 @@ explanation: "A uniquely-tagged TODO was created — its log line should reach G
 
 <h3 id="step-2-confirm-the-tagged-log-arrived-in-grail">Step 2 — Confirm the tagged log arrived in Grail<a class="headerlink" href="#step-2-confirm-the-tagged-log-arrived-in-grail" title="Permanent link">#</a></h3>
 <p>This DQL matches <strong>only</strong> the tagged probe log from the last 15 minutes — generic <code>Adding a new todo</code> logs and older runs are filtered out. The check button retries while the log makes its way to Grail.</p>
+<p>The <code>k8s.cluster.name</code> filter scopes the query to <strong>your</strong> cluster: every session gets a unique cluster identity ending in your session id (<code>{{DT_SESSION_ID}}</code>), so classmates running this training against the same tenant never pollute your results.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>fetch logs
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>| filter k8s.namespace.name == &quot;todoapp&quot;
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>| filter contains(content, &quot;K8S101LOGPROBE&quot;)
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>| filter timestamp &gt; now() - 15m
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>| limit 5
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>| filter endsWith(k8s.cluster.name, &quot;{{DT_SESSION_ID}}&quot;)
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>| filter k8s.namespace.name == &quot;todoapp&quot;
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>| filter contains(content, &quot;K8S101LOGPROBE&quot;)
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>| filter timestamp &gt; now() - 15m
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>| limit 5
 </span></code></pre></div>
 <!-- LAB_QUESTION
 type: dql-verification
@@ -727,6 +729,7 @@ question: "Verify the uniquely-tagged TODO log reached Dynatrace Grail"
 buttonText: "Check tagged log in Grail"
 dql: |
   fetch logs
+  | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
   | filter k8s.namespace.name == "todoapp"
   | filter contains(content, "K8S101LOGPROBE")
   | filter timestamp > now() - 15m
@@ -738,8 +741,8 @@ explanation: "The tagged log reached Grail — the full app → OneAgent → Gra
 -->
 
 <div class="admonition tip">
-<p class="admonition-title">Why the tag</p>
-<p>Matching <code>K8S101LOGPROBE</code> (a probe-only marker) instead of the generic <code>Adding a new todo</code> guarantees the log came from <strong>this</strong> verification step, and the <code>now() - 15m</code> window keeps a previous run from giving a false pass.</p>
+<p class="admonition-title">Why the tag and the cluster filter</p>
+<p>Matching <code>K8S101LOGPROBE</code> (a probe-only marker) instead of the generic <code>Adding a new todo</code> guarantees the log came from <strong>this</strong> verification step, and the <code>now() - 15m</code> window keeps a previous run from giving a false pass. The <code>endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")</code> filter guarantees it came from <strong>your</strong> cluster — not a classmate's — when many sessions share one tenant.</p>
 </div>
 <h2 id="explore-your-services-in-dynatrace">Explore your services in Dynatrace<a class="headerlink" href="#explore-your-services-in-dynatrace" title="Permanent link">#</a></h2>
 <p>Now that the application is instrumented, use the Dynatrace Services App to see the automatically discovered services, performance indicators, and distributed traces from the <code>todoapp</code> namespace.</p>
