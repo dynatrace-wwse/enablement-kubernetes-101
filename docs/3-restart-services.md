@@ -82,8 +82,11 @@ explanation: "A uniquely-tagged TODO was created — its log line should reach G
 
 This DQL matches **only** the tagged probe log from the last 15 minutes — generic `Adding a new todo` logs and older runs are filtered out. The check button retries while the log makes its way to Grail.
 
+The `k8s.cluster.name` filter scopes the query to **your** cluster: every session gets a unique cluster identity ending in your session id (`{{DT_SESSION_ID}}`), so classmates running this training against the same tenant never pollute your results.
+
 ```dql
 fetch logs
+| filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
 | filter k8s.namespace.name == "todoapp"
 | filter contains(content, "K8S101LOGPROBE")
 | filter timestamp > now() - 15m
@@ -96,6 +99,7 @@ question: "Verify the uniquely-tagged TODO log reached Dynatrace Grail"
 buttonText: "Check tagged log in Grail"
 dql: |
   fetch logs
+  | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
   | filter k8s.namespace.name == "todoapp"
   | filter contains(content, "K8S101LOGPROBE")
   | filter timestamp > now() - 15m
@@ -106,8 +110,8 @@ hint: "Run the previous step first. Logs take ~1–2 minutes to reach Grail — 
 explanation: "The tagged log reached Grail — the full app → OneAgent → Grail pipeline is verified end-to-end."
 -->
 
-!!! tip "Why the tag"
-    Matching `K8S101LOGPROBE` (a probe-only marker) instead of the generic `Adding a new todo` guarantees the log came from **this** verification step, and the `now() - 15m` window keeps a previous run from giving a false pass.
+!!! tip "Why the tag and the cluster filter"
+    Matching `K8S101LOGPROBE` (a probe-only marker) instead of the generic `Adding a new todo` guarantees the log came from **this** verification step, and the `now() - 15m` window keeps a previous run from giving a false pass. The `endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")` filter guarantees it came from **your** cluster — not a classmate's — when many sessions share one tenant.
 
 ## Explore your services in Dynatrace
 
