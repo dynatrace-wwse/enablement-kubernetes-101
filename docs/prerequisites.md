@@ -17,10 +17,10 @@ Expected output: one node with status `Ready`.
 type: shell-verification
 question: "Verify the cluster node is Ready"
 buttonText: "Check Cluster"
-command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && waitForNodeReady"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkNodeReady"
 expect:
   operator: exit-zero
-hint: "The cluster is provisioned automatically. The check waits up to ~90s for the node to reach Ready."
+hint: "The cluster is provisioned automatically at startup. If the node is not Ready yet, wait a moment and check again."
 explanation: "Cluster node is Ready — you are good to proceed."
 -->
 
@@ -50,10 +50,10 @@ You can open the app in the navigation tab "Apps". Once it's registered you'll b
 type: shell-verification
 question: "Verify the TODO application pods are Running"
 buttonText: "Check Application"
-command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && waitForTodoAppRunning"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkTodoAppRunning"
 expect:
   operator: exit-zero
-hint: "The application is deployed automatically. The check waits up to ~150s for the todoapp pods to be Running."
+hint: "The application is deployed automatically. If the todoapp pods are not Running yet, wait a moment and check again."
 explanation: "TODO application pods are Running — your environment is ready."
 -->
 

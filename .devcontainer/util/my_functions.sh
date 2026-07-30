@@ -14,83 +14,101 @@ customFunction(){
 }
 
 # ======================================================================
-#   Step-by-step end-to-end verification helpers
+#   Step-by-step verification helpers
 # ----------------------------------------------------------------------
 #   Called from the lab pages' `shell-verification` blocks (source the
-#   framework first, then call the function). Each Kubernetes/Dynatrace
-#   action is asynchronous, so every helper WAITS (bounded retry) for the
-#   expected state instead of checking once — this lets the Enablement App
-#   (and the app-layer-test driver) verify a step right after the previous
-#   one without racing the rollout.
+#   framework first, then call the function).
+#
+#   Learner clicks answer INSTANTLY: one probe, immediate pass/fail with
+#   a clear message — never a spinner while the check retries.
+#
+#   Automation (lab-driver, agentic validator, solution runs) exports
+#   LAB_WAIT=1 first: the check then waits for the expected state before
+#   probing — using the framework wait function bound to that resource
+#   where one exists (waitForPod, waitForAllReadyPods) — so verifying a
+#   step right after running its solution doesn't race the rollout.
+#
+#   The waitFor* names are kept as LAB_WAIT wrappers so already-imported
+#   lab content and published docs keep working during the transition.
 # ======================================================================
 
-# Cluster node reaches Ready.
-waitForNodeReady() {
-  printInfoSection "Waiting for the cluster node to be Ready"
-  local i=0
-  while [ "$i" -lt 18 ]; do
-    [ "$(kubectl get nodes --no-headers 2>/dev/null | grep -c ' Ready')" -gt 0 ] && { printInfo "node Ready"; return 0; }
-    i=$((i + 1)); printInfo "node not Ready yet ($i/18), waiting 5s"; sleep 5
-  done
-  printError "Cluster node not Ready in time"; return 1
+# Cluster node is Ready.
+checkNodeReady() {
+  if [ -n "${LAB_WAIT:-}" ]; then
+    local i=0
+    while [ "$i" -lt 18 ]; do
+      [ "$(kubectl get nodes --no-headers 2>/dev/null | grep -c ' Ready')" -gt 0 ] && break
+      i=$((i + 1)); printInfo "node not Ready yet ($i/18), waiting 5s"; sleep 5
+    done
+  fi
+  if [ "$(kubectl get nodes --no-headers 2>/dev/null | grep -c ' Ready')" -gt 0 ]; then
+    printInfo "Cluster node is Ready"; return 0
+  fi
+  printError "Cluster node is not Ready yet"; return 1
 }
+waitForNodeReady() { LAB_WAIT=1 checkNodeReady; }
 
-# TODO app pods reach Running in the todoapp namespace.
-waitForTodoAppRunning() {
-  printInfoSection "Waiting for the todoapp pods to be Running"
-  local i=0
-  while [ "$i" -lt 30 ]; do
-    [ "$(kubectl get pods -n todoapp --no-headers 2>/dev/null | grep -c Running)" -gt 0 ] && { printInfo "todoapp Running"; return 0; }
-    i=$((i + 1)); printInfo "todoapp not Running yet ($i/30), waiting 5s"; sleep 5
-  done
-  printError "todoapp pods not Running in time"; return 1
+# TODO app pods are Running in the todoapp namespace.
+checkTodoAppRunning() {
+  [ -n "${LAB_WAIT:-}" ] && waitForAllReadyPods todoapp
+  if [ "$(kubectl get pods -n todoapp --no-headers 2>/dev/null | grep -c Running)" -gt 0 ]; then
+    printInfo "todoapp pods are Running"; return 0
+  fi
+  printError "todoapp pods are not Running yet — the environment may still be starting"; return 1
 }
+waitForTodoAppRunning() { LAB_WAIT=1 checkTodoAppRunning; }
 
-# Dynatrace Operator manager pod reaches Running (Section 1).
-waitForOperatorReady() {
-  printInfoSection "Waiting for the Dynatrace Operator pod to be Running"
-  local i=0
-  while [ "$i" -lt 36 ]; do
-    kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -E 'operator' | grep -q Running && { printInfo "operator Running"; return 0; }
-    i=$((i + 1)); printInfo "operator not Running yet ($i/36), waiting 5s"; sleep 5
-  done
-  printError "Dynatrace Operator pod not Running in time"; return 1
+# Dynatrace Operator manager pod is Running (Section 1).
+checkOperatorReady() {
+  [ -n "${LAB_WAIT:-}" ] && waitForPod dynatrace operator
+  if kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -E 'operator' | grep -q Running; then
+    printInfo "Dynatrace Operator pod is Running"; return 0
+  fi
+  printError "Dynatrace Operator is not running — run the Helm install steps above, then check again"; return 1
 }
+waitForOperatorReady() { LAB_WAIT=1 checkOperatorReady; }
 
 # DynaKube custom resource exists (Section 2).
-waitForDynakube() {
-  printInfoSection "Waiting for the DynaKube custom resource"
-  local i=0
-  while [ "$i" -lt 30 ]; do
-    kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | grep -q . && { printInfo "DynaKube present"; return 0; }
-    i=$((i + 1)); printInfo "no DynaKube yet ($i/30), waiting 5s"; sleep 5
-  done
-  printError "DynaKube custom resource not found in time"; return 1
+checkDynakube() {
+  if [ -n "${LAB_WAIT:-}" ]; then
+    local i=0
+    while [ "$i" -lt 30 ]; do
+      kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | grep -q . && break
+      i=$((i + 1)); printInfo "no DynaKube yet ($i/30), waiting 5s"; sleep 5
+    done
+  fi
+  if kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | grep -q .; then
+    printInfo "DynaKube custom resource is present"; return 0
+  fi
+  printError "No DynaKube found in the dynatrace namespace — apply the generated manifest, then check again"; return 1
 }
+waitForDynakube() { LAB_WAIT=1 checkDynakube; }
 
-# ActiveGate pod reaches Running in the dynatrace namespace (Section 2).
-waitForActiveGateReady() {
-  printInfoSection "Waiting for the ActiveGate pod to be Running"
-  local i=0
-  while [ "$i" -lt 36 ]; do
-    kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -i activegate | grep -q Running && { printInfo "ActiveGate Running"; return 0; }
-    i=$((i + 1)); printInfo "ActiveGate not Running yet ($i/36), waiting 10s"; sleep 10
-  done
-  printError "ActiveGate pod not Running in time"; return 1
+# ActiveGate pod is Running in the dynatrace namespace (Section 2).
+checkActiveGateReady() {
+  [ -n "${LAB_WAIT:-}" ] && waitForPod dynatrace activegate
+  if kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -i activegate | grep -q Running; then
+    printInfo "ActiveGate pod is Running"; return 0
+  fi
+  printError "ActiveGate pod is not Running yet — it can take a minute or two after the DynaKube is applied; check again shortly"; return 1
 }
+waitForActiveGateReady() { LAB_WAIT=1 checkActiveGateReady; }
 
 # OneAgent injection annotation present on the restarted todoapp pods (Section 3).
-waitForOneAgentInjected() {
-  printInfoSection "Waiting for the OneAgent injection annotation on todoapp pods"
-  local i=0
-  while [ "$i" -lt 24 ]; do
-    if kubectl get pods -n todoapp -o jsonpath='{.items[*].metadata.annotations.oneagent\.dynatrace\.com/injected}' 2>/dev/null | tr ' ' '\n' | grep -q true; then
-      printInfo "OneAgent injected"; return 0
-    fi
-    i=$((i + 1)); printInfo "not injected yet ($i/24), waiting 10s"; sleep 10
-  done
-  printError "OneAgent injection annotation not present in time"; return 1
+checkOneAgentInjected() {
+  if [ -n "${LAB_WAIT:-}" ]; then
+    local i=0
+    while [ "$i" -lt 24 ]; do
+      kubectl get pods -n todoapp -o jsonpath='{.items[*].metadata.annotations.oneagent\.dynatrace\.com/injected}' 2>/dev/null | tr ' ' '\n' | grep -q true && break
+      i=$((i + 1)); printInfo "not injected yet ($i/24), waiting 10s"; sleep 10
+    done
+  fi
+  if kubectl get pods -n todoapp -o jsonpath='{.items[*].metadata.annotations.oneagent\.dynatrace\.com/injected}' 2>/dev/null | tr ' ' '\n' | grep -q true; then
+    printInfo "OneAgent is injected into the todoapp pods"; return 0
+  fi
+  printError "OneAgent injection annotation not present — restart the todoapp deployment and wait for the rollout, then check again"; return 1
 }
+waitForOneAgentInjected() { LAB_WAIT=1 checkOneAgentInjected; }
 
 # Tag that distinguishes THIS test's TODO log from every other todo log in Grail.
 TODO_PROBE_TAG="K8S101LOGPROBE"
@@ -98,7 +116,8 @@ TODO_PROBE_TAG="K8S101LOGPROBE"
 # Generate a uniquely-tagged log line by creating a TODO via the app's HTTP API
 # (same curl path as the live-debugger lab). The tag (TODO_PROBE_TAG + a per-run
 # nonce) is what the Grail DQL matches, so no other todo activity interferes.
-# Waits for the app HTTP endpoint to answer first (ingress + app startup take time).
+# Learner click: single attempt, fail fast if the endpoint isn't up.
+# LAB_WAIT=1 (automation): waits for the endpoint first (ingress + app startup).
 generateTodoTraffic() {
   local nonce="${TODO_PROBE_TAG}-$(date +%s)-${RANDOM}"
   local url="http://localhost:${K3D_LB_HTTP_PORT:-80}"
@@ -106,12 +125,17 @@ generateTodoTraffic() {
   printInfoSection "Generating a uniquely-tagged TODO to verify logs reach Grail"
   printInfo "tag: $nonce  | endpoint: $url (Host: $host)"
 
-  local i=0 reachable=1
-  while [ "$i" -lt 30 ]; do
-    if curl -sf -o /dev/null -H "Host: $host" "$url/todos"; then reachable=0; break; fi
-    i=$((i + 1)); printInfo "app endpoint not ready ($i/30), waiting 5s"; sleep 5
-  done
-  [ "$reachable" -ne 0 ] && { printError "todoapp HTTP endpoint not reachable"; return 1; }
+  if [ -n "${LAB_WAIT:-}" ]; then
+    local i=0
+    while [ "$i" -lt 30 ]; do
+      curl -sf -o /dev/null -H "Host: $host" "$url/todos" && break
+      i=$((i + 1)); printInfo "app endpoint not ready ($i/30), waiting 5s"; sleep 5
+    done
+  fi
+  if ! curl -sf -o /dev/null -H "Host: $host" "$url/todos"; then
+    printError "todoapp HTTP endpoint not reachable yet — make sure the app is running, then try again"
+    return 1
+  fi
 
   local resp
   resp=$(curl -s -H "Host: $host" -X POST "$url/todos" -H "Content-Type: application/json" \

@@ -34,10 +34,10 @@ The check below verifies that the restarted pods have the `oneagent.dynatrace.co
 type: shell-verification
 question: "Verify OneAgent was injected into the todoapp pods"
 buttonText: "Check Injection"
-command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && waitForOneAgentInjected"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkOneAgentInjected"
 expect:
   operator: exit-zero
-hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab. The check waits up to ~4 min for the `oneagent.dynatrace.com/injected: true` annotation on the restarted pods."
+hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab and wait for the rollout to finish, then check again — it looks for the `oneagent.dynatrace.com/injected: true` annotation on the restarted pods."
 explanation: "OneAgent injected — the todoapp pods have the `oneagent.dynatrace.com/injected: true` annotation confirming agent injection at startup."
 -->
 
@@ -56,7 +56,7 @@ reveal: |
 commands:
   - kubectl rollout restart deployment -n todoapp && kubectl rollout status deployment -n todoapp --timeout=120s
 verify:
-  - "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && waitForOneAgentInjected"
+  - "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkOneAgentInjected"
 -->
 
 ## Verify logs reach Grail (end-to-end)
@@ -74,7 +74,7 @@ buttonText: "Generate tagged log"
 command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && generateTodoTraffic"
 expect:
   operator: exit-zero
-hint: "Needs OneAgent injected (previous step) and the todoapp reachable via the ingress. The check waits for the endpoint, then POSTs the tagged TODO."
+hint: "Needs OneAgent injected (previous step) and the todoapp reachable via the ingress. The check POSTs the tagged TODO immediately — if the endpoint is not reachable yet, wait a moment and try again."
 explanation: "A uniquely-tagged TODO was created — its log line should reach Grail within ~2 minutes."
 -->
 
@@ -106,7 +106,7 @@ dql: |
   | limit 1
 expect:
   operator: not-empty
-hint: "Run the previous step first. Logs take ~1–2 minutes to reach Grail — the check retries, so give it a moment."
+hint: "Run the previous step first. Logs take ~1–2 minutes to reach Grail — if nothing is found yet, wait a moment and check again."
 explanation: "The tagged log reached Grail — the full app → OneAgent → Grail pipeline is verified end-to-end."
 -->
 
