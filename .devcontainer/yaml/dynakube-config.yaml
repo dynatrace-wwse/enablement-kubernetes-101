@@ -1,5 +1,0 @@
-# Repo override (see framework dynakube-defaults.yaml): run the platform-token-
-# capable operator now, ahead of the framework default bump. Operator >= 1.10
-# accepts a platform token as the DynaKube secret apiToken (gen3 tenants mint
-# platform tokens); classic tokens keep working unchanged.
-operator_version: "1.10.2"
