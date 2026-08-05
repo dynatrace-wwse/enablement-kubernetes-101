@@ -1,3 +1,5 @@
+<!-- LAB_NO_SOLUTION: Provisioning sanity checks (cluster node Ready, demo app running) — the environment provides these, there is nothing for the learner to solve. -->
+
 
 # Prerequisites
 
