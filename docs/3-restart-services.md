@@ -1,10 +1,18 @@
 # Section 3 — Restart Application Services
 
-The Dynatrace OneAgent injects itself into processes at startup time. Pods that were already running **before** the OneAgent DaemonSet was deployed will not be instrumented until they are restarted. This is a normal part of the OneAgent lifecycle.
+In the previous section your cluster started sending **logs** without you touching the application at all. **Traces are different.** To trace a request, Dynatrace has to run *inside* your application process — and a process can only be instrumented at the moment it starts.
+
+Your `todoapp` has been running since before you deployed the DynaKube, so it started without the agent. Restart it, and the new pods come up instrumented.
 
 ## Why a restart is needed
 
-When a pod starts, OneAgent's init container intercepts the process and injects the agent library. Pods that existed before OneAgent was deployed never went through this injection step, so restarting them triggers the injection.
+In Application Observability mode there is no OneAgent DaemonSet on your nodes. Instead:
+
+1. Dynatrace registers a **mutating webhook** in your cluster.
+2. Every time a pod is *created*, the webhook rewrites its spec to mount the OneAgent code module (delivered by the **CSI driver**) and to load it into the application process.
+3. Pods that already existed never passed through that webhook — so they are not instrumented, and never will be until they are recreated.
+
+A rolling restart recreates them, which is all it takes.
 
 ## Step 1 — Restart all deployments in todoapp
 
@@ -21,10 +29,6 @@ kubectl rollout status deployment -n todoapp --timeout=120s
 ```
 
 When the rollout finishes, the new pods will have been started with OneAgent already injected.
-
-## Step 3 — Verify in Dynatrace
-
-Open your Dynatrace tenant and navigate to **Services** or **Kubernetes** — within a few minutes you should see the `todoapp` service and its processes appearing automatically, with distributed traces flowing in.
 
 ## Validation — OneAgent injected
 
@@ -59,62 +63,132 @@ verify:
   - "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkOneAgentInjected"
 -->
 
-## Verify logs reach Grail (end-to-end)
+## Use the application
 
-This is the real end-to-end signal: app → OneAgent → Dynatrace Grail. We generate a **uniquely-tagged** TODO via the app's HTTP API, then confirm *that specific* log line arrives in Grail — so no other todo activity (or a previous run) can give a false pass.
+An instrumented application only produces data when someone uses it. So use it — add a todo.
 
-### Step 1 — Open the app and create a Todo
+### Step 1 — Open your Todo app
 
-This will create a todo task, this will be logged and traced.
-
-`generateTodoTraffic` waits for the app's HTTP endpoint to answer, then creates a TODO whose title carries the tag `K8S101LOGPROBE` plus a per-run nonce (the same CURL path the Live Debugger lab uses to add a task). The app logs the title, so the tag lands in the log content.
+Your app's URL depends on where this environment is running, so ask the environment for it rather than guessing. The button below prints it:
 
 <!-- LAB_QUESTION
 type: shell-verification
-question: "Generate a uniquely-tagged TODO so we can verify its log reaches Grail"
-buttonText: "Generate tagged log"
+question: "Get the URL of your Todo application"
+buttonText: "Show my app URL"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && getAppURL todoapp"
+expect:
+  operator: not-empty
+hint: "The app is deployed in the `todoapp` namespace and exposed through the nginx ingress. If this comes back empty, check `kubectl get pods -n todoapp`."
+explanation: "That is your Todo app — open it in a new browser tab."
+-->
+
+!!! tip "Other ways to find it"
+    The same URL is printed in the greeting every time you open a Terminal, and `listApps` will print it on demand.
+
+### Step 2 — Add a todo
+
+Open the URL, type **anything** into the todo box — the text does not matter — and add it.
+
+That single click produces both signals we are about to look for:
+
+- a **log line**, because the app logs every todo it accepts;
+- a **trace**, because the request now runs through an instrumented process.
+
+<!-- LAB_QUESTION
+type: shell-verification
+question: "Confirm the app accepts a new todo"
+buttonText: "Add a todo for me"
 command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && generateTodoTraffic"
 expect:
   operator: exit-zero
-hint: "Needs OneAgent injected (previous step) and the todoapp reachable via the ingress. The check POSTs the tagged TODO immediately — if the endpoint is not reachable yet, wait a moment and try again."
-explanation: "A uniquely-tagged TODO was created — its log line should reach Grail within ~2 minutes."
+hint: "Needs the todoapp reachable via the ingress. If the endpoint is not answering yet, wait a moment and try again."
+explanation: "A todo was created — its log line and its trace should reach Grail within ~2 minutes."
 -->
 
+!!! note "Prefer to click?"
+    Adding the todo by hand in the app UI does exactly the same thing. The button above is here so the step also works when nobody is at the keyboard — it posts a todo titled *Kubernetes 101* through the same HTTP endpoint the UI uses.
 
-### Step 2 — Confirm the tagged log arrived in Grail
+<!-- LAB_SOLUTION
+reveal: |
+  Open the app (`getAppURL todoapp`) and add a todo with any text you like.
 
-This DQL matches **only** the tagged probe log from the last 15 minutes — generic `Adding a new todo` logs and older runs are filtered out. The check button retries while the log makes its way to Grail.
+  The "Run solution" button does it for you over HTTP — it posts a todo titled
+  *Kubernetes 101* to the same `POST /todos` endpoint the UI calls, which produces
+  the same log line and the same trace.
+commands:
+  - "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && generateTodoTraffic"
+verify:
+  - "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && generateTodoTraffic"
+-->
 
-The `k8s.cluster.name` filter scopes the query to **your** cluster: every session gets a unique cluster identity ending in your session id (`{{DT_SESSION_ID}}`), so classmates running this training against the same tenant never pollute your results.
+## Verify the log
+
+The app logs each todo it accepts, with the title you typed:
+
+```
+com.dynatrace.todoapp.TodoController : Adding a new todo: TodoRecord{title='...'}
+```
+
+The `endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")` filter scopes the query to **your** cluster — every session gets a unique cluster identity ending in your session id, so classmates running this training against the same tenant never pollute your results.
 
 ```dql
-fetch logs
+fetch logs, from:now()-15m
 | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
 | filter k8s.namespace.name == "todoapp"
-| filter contains(content, "K8S101LOGPROBE")
-| filter timestamp > now() - 15m
+| filter contains(content, "Adding a new todo")
+| fields timestamp, content
 | limit 5
 ```
 
 <!-- LAB_QUESTION
 type: dql-verification
-question: "Verify the uniquely-tagged TODO log reached Dynatrace Grail"
-buttonText: "Check tagged log in Grail"
+question: "Verify the log line for your todo reached Dynatrace Grail"
+buttonText: "Check logs in Grail"
 dql: |
-  fetch logs
+  fetch logs, from:now()-15m
   | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
   | filter k8s.namespace.name == "todoapp"
-  | filter contains(content, "K8S101LOGPROBE")
-  | filter timestamp > now() - 15m
+  | filter contains(content, "Adding a new todo")
   | limit 1
 expect:
   operator: not-empty
-hint: "Run the previous step first. Logs take ~1–2 minutes to reach Grail — if nothing is found yet, wait a moment and check again."
-explanation: "The tagged log reached Grail — the full app → OneAgent → Grail pipeline is verified end-to-end."
+hint: "Add a todo first (previous step). Logs take ~1–2 minutes to reach Grail — if nothing is found yet, wait a moment and check again."
+explanation: "Your todo's log line is in Grail — captured by the log module, with no code change to the application."
 -->
 
-!!! tip "Why the tag and the cluster filter"
-    Matching `K8S101LOGPROBE` (a probe-only marker) instead of the generic `Adding a new todo` guarantees the log came from **this** verification step, and the `now() - 15m` window keeps a previous run from giving a false pass. The `endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")` filter guarantees it came from **your** cluster — not a classmate's — when many sessions share one tenant.
+## Verify the trace
+
+This is the signal that did **not** exist before the restart. Adding a todo sends a `POST /todos` request, and the injected OneAgent now records it as a distributed trace — a root span named `POST /todos`, resolved to the `addTodo` endpoint of the application.
+
+Notice that the span carries the same Kubernetes context as the log (`k8s.cluster.name`, `k8s.namespace.name`, `k8s.workload.name`). That is metadata enrichment: Dynatrace stitches cluster identity onto the telemetry, which is exactly what lets you scope this query to your own cluster.
+
+```dql
+fetch spans, from:now()-15m
+| filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+| filter k8s.namespace.name == "todoapp"
+| filter span.name == "POST /todos"
+| fields start_time, span.name, endpoint.name, duration, k8s.workload.name
+| limit 5
+```
+
+<!-- LAB_QUESTION
+type: dql-verification
+question: "Verify the trace for your todo request reached Dynatrace Grail"
+buttonText: "Check traces in Grail"
+dql: |
+  fetch spans, from:now()-15m
+  | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+  | filter k8s.namespace.name == "todoapp"
+  | filter span.name == "POST /todos"
+  | limit 1
+expect:
+  operator: not-empty
+hint: "Traces only exist for pods restarted AFTER the DynaKube was applied — confirm the injection check above passed, then add another todo and wait ~1–2 minutes."
+explanation: "The trace is in Grail — the request was recorded from inside the application process, which is what the restart made possible."
+-->
+
+!!! tip "Why `endsWith` and not `==`"
+    Your cluster is named after the training plus your session id, but Kubernetes caps how long that name can be — so the *training* half gets truncated while the session id stays intact at the end. `endsWith` matches the part that is guaranteed to be there. `from:now()-15m` keeps an earlier run from giving a false pass.
 
 ## Explore your services in Dynatrace
 

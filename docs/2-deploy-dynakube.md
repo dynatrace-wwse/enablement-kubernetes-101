@@ -103,6 +103,62 @@ hint: "The ActiveGate pod may take 1–2 minutes to start after the DynaKube is 
 explanation: "ActiveGate is Running — your cluster is connected to the Dynatrace tenant and data will start flowing."
 -->
 
+## Your cluster is already capturing logs
+
+Here is the part people expect to be harder than it is: **there is nothing left for you to do.**
+
+The DynaKube you just applied enables the [Log Monitoring module](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment/k8s-log-monitoring). The operator rolls out a `dynatrace-logmodule` DaemonSet, one pod per node, and that pod tails the standard output of **every container on the node** straight from the node's log files.
+
+That means log collection needs:
+
+- **no application restart** — the log module reads files the container runtime already writes;
+- **no code injection** — it never touches your application process;
+- **no change to your application** — no logging library, no sidecar, no log driver.
+
+This is worth pausing on, because the *next* section is different: traces **do** require a restart, because the agent has to be injected into the process at startup. Logs come from outside the process; traces come from inside it.
+
+### Validation — the log module is running
+
+<!-- LAB_QUESTION
+type: shell-verification
+question: "Verify the Dynatrace log module is running on your cluster"
+buttonText: "Check log module"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkLogModuleReady"
+expect:
+  operator: exit-zero
+hint: "The log module DaemonSet is rolled out by the operator a few moments after the DynaKube is applied. Watch `kubectl get pods -n dynatrace` and check again once a `logmodule` pod is Running."
+explanation: "The log module is Running — every container's stdout on this node is now being shipped to Dynatrace."
+-->
+
+### Validation — logs are arriving in Grail
+
+The `todoapp` has been running since your environment started, and has never been restarted or instrumented — so any log line it produces is proof that the log module alone is doing the work.
+
+The `endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")` filter scopes the query to **your** cluster. Every session gets a unique cluster identity ending in your session id, so classmates running this training against the same tenant never pollute your results.
+
+```dql
+fetch logs, from:now()-15m
+| filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+| filter k8s.namespace.name == "todoapp"
+| fields timestamp, k8s.container.name, content
+| limit 5
+```
+
+<!-- LAB_QUESTION
+type: dql-verification
+question: "Verify your cluster's container logs are reaching Dynatrace Grail"
+buttonText: "Check logs in Grail"
+dql: |
+  fetch logs, from:now()-15m
+  | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+  | filter k8s.namespace.name == "todoapp"
+  | limit 1
+expect:
+  operator: not-empty
+hint: "The log module needs to be Running first (previous check), and logs take ~1–2 minutes to reach Grail. Wait a moment and check again."
+explanation: "Logs from your cluster are in Grail — captured with no restart, no injection and no application change."
+-->
+
 <!-- LAB_SOLUTION
 reveal: |
   The DynaKube manifest is generated for you from your tenant credentials (the

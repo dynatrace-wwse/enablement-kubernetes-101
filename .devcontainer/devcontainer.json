@@ -32,12 +32,17 @@
     }
   },
   	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// 80   = nginx ingress (the todoapp, via the catch-all rule)
+	// 8000 = mkdocs, which bypasses the ingress — Codespaces forwards one port
+	//        per service, so the docs cannot share port 80 with the app.
 	"forwardPorts": [
-		80
+		80,
+		8000
 	],
 	// add labels
 	"portsAttributes": {
-		"80": { "label": "Application Web UI" }
+		"80": { "label": "Application Web UI" },
+		"8000": { "label": "Documentation (MkDocs)" }
 	},
   // minimal CPU when running DT components and apps.
 	"hostRequirements": {
