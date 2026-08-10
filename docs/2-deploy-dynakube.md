@@ -62,6 +62,21 @@ kubectl get pods -n dynatrace --watch
 
 Wait until all pods show `Running` before continuing.
 
+??? tip "Watch with K9S"
+    [K9S](https://k9scli.io/) is a terminal-based Kubernetes UI that lets you watch and manage your Kubernetes clusters with style. Launch it with `k9s`, then navigate to the `dynatrace` namespace to see the dynatrace components updating live.
+
+    | Action | Command / Shortcut |
+    |---|---|
+    | Launch K9S | `k9s` |
+    | List pods in a namespace | `:pods` → type namespace filter, e.g. `dynatrace` |
+    | List all namespaces | `:namespaces` |
+    | View DynaKube custom resource | `:dynakube` → select the resource to inspect it |
+    | Describe a deployment | `:deployments` → select one → press `d` |
+    | Shell into a container | Select a pod → press `s` |
+    | Quit | `:q` or `Ctrl+C` |
+
+    ![K9S showing DynaKube and pods](img/k9s_dynatrace.png)
+
 ## Validation — DynaKube object exists
 
 <!-- LAB_QUESTION

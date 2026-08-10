@@ -63,7 +63,9 @@ verify:
 
 This is the real end-to-end signal: app → OneAgent → Dynatrace Grail. We generate a **uniquely-tagged** TODO via the app's HTTP API, then confirm *that specific* log line arrives in Grail — so no other todo activity (or a previous run) can give a false pass.
 
-### Step 1 — Generate a uniquely-tagged log line
+### Step 1 — Open the app and create a Todo
+
+This will create a todo task, this will be logged and traced.
 
 `generateTodoTraffic` waits for the app's HTTP endpoint to answer, then creates a TODO whose title carries the tag `K8S101LOGPROBE` plus a per-run nonce (the same CURL path the Live Debugger lab uses to add a task). The app logs the title, so the tag lands in the log content.
 
@@ -77,6 +79,7 @@ expect:
 hint: "Needs OneAgent injected (previous step) and the todoapp reachable via the ingress. The check POSTs the tagged TODO immediately — if the endpoint is not reachable yet, wait a moment and try again."
 explanation: "A uniquely-tagged TODO was created — its log line should reach Grail within ~2 minutes."
 -->
+
 
 ### Step 2 — Confirm the tagged log arrived in Grail
 
