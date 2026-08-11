@@ -139,7 +139,7 @@ The `endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")` filter scopes the query to
 The following query fetches the ammount of logs collected for your cluster sorted out by namespace and log level for the last 30 minutes.
 
 ```dql
-fetch logs, from:now()-30h
+fetch logs, from:now()-30m
 | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
 | summarize count = count(), by: {namespace = k8s.namespace.name, level = loglevel}
 | sort namespace asc, count desc
