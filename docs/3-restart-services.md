@@ -67,9 +67,9 @@ verify:
 
 An instrumented application only produces data when someone uses it. So use it — add a todo.
 
-### Step 1 — Open your Todo app
+### Step 1 — Open your Todo app and add a task
 
-Your app's URL depends on where this environment is running, so ask the environment for it rather than guessing. The button below prints it:
+Go to workspace and open the Todo app
 
 <!-- LAB_QUESTION
 type: shell-verification
