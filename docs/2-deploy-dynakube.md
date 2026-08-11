@@ -136,12 +136,13 @@ The `todoapp` has been running since your environment started, and has never bee
 
 The `endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")` filter scopes the query to **your** cluster. Every session gets a unique cluster identity ending in your session id, so classmates running this training against the same tenant never pollute your results.
 
+The following query fetches the ammount of logs collected for your cluster sorted out by namespace and log level for the last 30 minutes.
+
 ```dql
-fetch logs, from:now()-15m
+fetch logs, from:now()-30h
 | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
-| filter k8s.namespace.name == "todoapp"
-| fields timestamp, k8s.container.name, content
-| limit 5
+| summarize count = count(), by: {namespace = k8s.namespace.name, level = loglevel}
+| sort namespace asc, count desc
 ```
 
 <!-- LAB_QUESTION
@@ -151,7 +152,6 @@ buttonText: "Check logs in Grail"
 dql: |
   fetch logs, from:now()-15m
   | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
-  | filter k8s.namespace.name == "todoapp"
   | limit 1
 expect:
   operator: not-empty
