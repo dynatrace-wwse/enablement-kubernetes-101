@@ -117,7 +117,7 @@ waitForOneAgentInjected() { LAB_WAIT=1 checkOneAgentInjected; }
 # exactly the point Section 2 makes.
 checkLogModuleReady() {
   [ -n "${LAB_WAIT:-}" ] && waitForPod dynatrace logmodule
-  if kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -i logmodule | grep -q Running; then
+  if kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -i logmonitoring | grep -q Running; then
     printInfo "Dynatrace log module is Running — your cluster's container logs are being captured"; return 0
   fi
   printError "Log module pod is not Running yet — it starts shortly after the DynaKube is applied; check again in a moment"; return 1
