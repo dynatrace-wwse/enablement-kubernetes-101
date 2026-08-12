@@ -32,8 +32,9 @@ kubectl rollout restart deployment -n todoapp
 kubectl rollout status deployment -n todoapp
 
 # Logs
-kubectl logs -n dynatrace -l app=dynatrace-operator
-kubectl logs -n dynatrace -l app=oneagent
+kubectl logs -n dynatrace -l app.kubernetes.io/name=dynatrace-operator
+# Log monitoring pods (AppOnly mode has no OneAgent DaemonSet)
+kubectl get pods -n dynatrace | grep logmonitoring
 ```
 
 ## Dynatrace Helm chart reference
