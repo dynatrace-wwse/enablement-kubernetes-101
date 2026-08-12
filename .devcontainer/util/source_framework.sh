@@ -13,11 +13,7 @@
 #                    Local to the container -> fast access, lost on container rebuild
 
 # Framework version pin — sync push-update updates this line
-# TEMPORARY: pinned to the framework branch, not a tag, so this branch can be
-# tested in a Codespace before the framework release is cut. `git clone -b`
-# takes a branch as happily as a tag.
-# >>> FLIP THIS TO 1.9.8 BEFORE MERGING <<<
-FRAMEWORK_VERSION="${FRAMEWORK_VERSION:-fix/codespaces-urls}"
+FRAMEWORK_VERSION="${FRAMEWORK_VERSION:-1.9.8}"
 
 # Derive REPO_PATH from this script's own location (repo/.devcontainer/util/...),
 # NOT from $(pwd): shells opened outside the repo dir (docker exec lands in "/")
