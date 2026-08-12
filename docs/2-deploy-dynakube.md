@@ -62,6 +62,21 @@ kubectl get pods -n dynatrace --watch
 
 Wait until all pods show `Running` before continuing.
 
+??? tip "Watch with K9S"
+    [K9S](https://k9scli.io/) is a terminal-based Kubernetes UI that lets you watch and manage your Kubernetes clusters with style. Launch it with `k9s`, then navigate to the `dynatrace` namespace to see the dynatrace components updating live.
+
+    | Action | Command / Shortcut |
+    |---|---|
+    | Launch K9S | `k9s` |
+    | List pods in a namespace | `:pods` → type namespace filter, e.g. `dynatrace` |
+    | List all namespaces | `:namespaces` |
+    | View DynaKube custom resource | `:dynakube` → select the resource to inspect it |
+    | Describe a deployment | `:deployments` → select one → press `d` |
+    | Shell into a container | Select a pod → press `s` |
+    | Quit | `:q` or `Ctrl+C` |
+
+    ![K9S showing DynaKube and pods](img/k9s_dynatrace.png)
+
 ## Validation — DynaKube object exists
 
 <!-- LAB_QUESTION
@@ -86,6 +101,65 @@ expect:
   operator: exit-zero
 hint: "The ActiveGate pod may take 1–2 minutes to start after the DynaKube is applied. Watch `kubectl get pods -n dynatrace` and check again once it is Running."
 explanation: "ActiveGate is Running — your cluster is connected to the Dynatrace tenant and data will start flowing."
+-->
+
+## Your cluster is already capturing logs
+
+Here is the part people expect to be harder than it is: **there is nothing left for you to do.**
+
+The DynaKube you just applied enables the [Log Monitoring module](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment/k8s-log-monitoring). The operator rolls out a log monitoring DaemonSet — its pods are named after your DynaKube, ending in `-logmonitoring` — one pod per node, and that pod tails the standard output of **every container on the node** straight from the node's log files.
+
+That means log collection needs:
+
+- **no application restart** — the log module reads files the container runtime already writes;
+- **no code injection** — it never touches your application process;
+- **no change to your application** — no logging library, no sidecar, no log driver.
+
+This is worth pausing on, because the *next* section is different: traces **do** require a restart, because the agent has to be injected into the process at startup. Logs come from outside the process; traces come from inside it.
+
+### Validation — the log module is running
+
+<!-- LAB_QUESTION
+type: shell-verification
+question: "Verify the Dynatrace log module is running on your cluster"
+buttonText: "Check log module"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkLogModuleReady"
+expect:
+  operator: exit-zero
+hint: "The log module DaemonSet is rolled out by the operator a few moments after the DynaKube is applied. Watch `kubectl get pods -n dynatrace` and check again once a `logmonitoring` pod is Running."
+explanation: "The log module is Running — every container's stdout on this node is now being shipped to Dynatrace."
+-->
+
+### Validation — logs are arriving in Grail
+
+The `todoapp` has been running since your environment started, and has never been restarted or instrumented — so any log line it produces is proof that the log module alone is doing the work.
+
+The `endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")` filter scopes the query to **your** cluster. Every session gets a unique cluster identity ending in your session id, so classmates running this training against the same tenant never pollute your results.
+
+The query below counts the log lines collected from your cluster in the last 30 minutes, grouped by namespace and log level. The result is a small table that proves something bigger than "logs arrive": **every namespace on the cluster is shipping logs** — the demo app, the Dynatrace components, the system namespaces — all without touching a single one of them.
+
+```dql
+fetch logs, from:now()-30m
+| filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+| summarize count = count(), by: {namespace = k8s.namespace.name, level = loglevel}
+| sort namespace asc, count desc
+```
+
+!!! tip "Why `endsWith` and not `==`"
+    Your cluster is named after the training plus your session id, but Kubernetes caps how long that name can be — so the *training* half gets truncated while your session id stays intact at the end. `endsWith` matches the part that is guaranteed to survive.
+
+<!-- LAB_QUESTION
+type: dql-verification
+question: "Verify your cluster's container logs are reaching Dynatrace Grail"
+buttonText: "Check logs in Grail"
+dql: |
+  fetch logs, from:now()-15m
+  | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+  | limit 1
+expect:
+  operator: not-empty
+hint: "The log module needs to be Running first (previous check), and logs take ~1–2 minutes to reach Grail. Wait a moment and check again."
+explanation: "Logs from your cluster are in Grail — captured with no restart, no injection and no application change."
 -->
 
 <!-- LAB_SOLUTION

@@ -110,20 +110,40 @@ checkOneAgentInjected() {
 }
 waitForOneAgentInjected() { LAB_WAIT=1 checkOneAgentInjected; }
 
-# Tag that distinguishes THIS test's TODO log from every other todo log in Grail.
-TODO_PROBE_TAG="K8S101LOGPROBE"
+# Dynatrace log module pod is Running (Section 2).
+# Container logs are captured by the log monitoring DaemonSet (pods named
+# <dynakube>-logmonitoring, image dynatrace-logmodule), which the
+# operator rolls out from the DynaKube's `logMonitoring` section. It tails
+# container stdout — no pod restart and no code injection are involved, which is
+# exactly the point Section 2 makes.
+checkLogModuleReady() {
+  [ -n "${LAB_WAIT:-}" ] && waitForPod dynatrace logmonitoring
+  if kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -i logmonitoring | grep -q Running; then
+    printInfo "Dynatrace log module is Running — your cluster's container logs are being captured"; return 0
+  fi
+  printError "Log module pod is not Running yet — it starts shortly after the DynaKube is applied; check again in a moment"; return 1
+}
+waitForLogModuleReady() { LAB_WAIT=1 checkLogModuleReady; }
 
-# Generate a uniquely-tagged log line by creating a TODO via the app's HTTP API
-# (same curl path as the live-debugger lab). The tag (TODO_PROBE_TAG + a per-run
-# nonce) is what the Grail DQL matches, so no other todo activity interferes.
+# Create a TODO via the app's HTTP API (the same curl path the live-debugger lab
+# uses). The learner normally does this by hand in the app UI with any text they
+# like; this function is the automation equivalent — it backs the step's
+# LAB_SOLUTION and the nightly training-test, neither of which can click a web UI.
+#
+# The title is fixed on purpose: the app logs it verbatim as
+#   TodoController : Adding a new todo: TodoRecord{title='...'}
+# and the verification DQL matches "Adding a new todo", so the hand-typed and the
+# automated path produce the same evidence. A random nonce bought nothing — the
+# DQL never matched it, only the query's time window separated runs.
+#
 # Learner click: single attempt, fail fast if the endpoint isn't up.
 # LAB_WAIT=1 (automation): waits for the endpoint first (ingress + app startup).
 generateTodoTraffic() {
-  local nonce="${TODO_PROBE_TAG}-$(date +%s)-${RANDOM}"
+  local title="Kubernetes 101"
   local url="http://localhost:${K3D_LB_HTTP_PORT:-80}"
   local host="todoapp.$(detectHostname)"
-  printInfoSection "Generating a uniquely-tagged TODO to verify logs reach Grail"
-  printInfo "tag: $nonce  | endpoint: $url (Host: $host)"
+  printInfoSection "Creating a TODO so logs and traces reach Grail"
+  printInfo "title: $title  | endpoint: $url (Host: $host)"
 
   if [ -n "${LAB_WAIT:-}" ]; then
     local i=0
@@ -139,11 +159,11 @@ generateTodoTraffic() {
 
   local resp
   resp=$(curl -s -H "Host: $host" -X POST "$url/todos" -H "Content-Type: application/json" \
-    -d "{\"title\":\"$nonce\",\"completed\":false}")
+    -d "{\"title\":\"$title\",\"completed\":false}")
   if echo "$resp" | grep -q '"status":"ok"'; then
-    printInfo "Created tagged TODO: $nonce — its log should appear in Grail within ~2 min"
+    printInfo "Created TODO \"$title\" — its log and its POST /todos trace should appear in Grail within ~2 min"
     return 0
   fi
-  printError "Failed to create tagged TODO. Response: $resp"
+  printError "Failed to create the TODO. Response: $resp"
   return 1
 }
