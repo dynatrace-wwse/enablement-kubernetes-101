@@ -1,5 +1,5 @@
 ---
-description: Instrument a live Kubernetes cluster with Dynatrace from scratch — deploy the Operator, configure a DynaKube, and observe full-stack metrics, traces, and logs.
+description: Instrument a live Kubernetes cluster with Dynatrace from scratch — deploy the Operator, configure a DynaKube, and watch logs, traces, and metrics arrive in Grail.
 tags:
   - kubernetes
   - observability
@@ -20,8 +20,8 @@ In this hands-on training you will instrument a live Kubernetes cluster with Dyn
 |------|--------|-----------|
 | Prerequisites | Verify the cluster and demo app are ready | `kubectl get nodes`, `kubectl get pods` |
 | 1 | Deploy the **Dynatrace Operator** via Helm | Operator pod is `Running` in `dynatrace` namespace |
-| 2 | Deploy the **DynaKube** custom resource from the Dynatrace UI | DynaKube object exists; ActiveGate pod is `Running` |
-| 3 | **Restart** the application services to pick up instrumentation | Application pods come back `Running` with the agent injected |
+| 2 | Deploy the **DynaKube** custom resource | DynaKube object exists; ActiveGate is `Running`; logs arrive in Grail with no restart |
+| 3 | **Restart** the application services to pick up instrumentation | Agent injected; your todo's log line and trace arrive in Grail |
 
 Each step has an automated shell check built into the documentation — you must pass the check before you can continue.
 

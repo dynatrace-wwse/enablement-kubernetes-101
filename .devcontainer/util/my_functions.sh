@@ -111,12 +111,13 @@ checkOneAgentInjected() {
 waitForOneAgentInjected() { LAB_WAIT=1 checkOneAgentInjected; }
 
 # Dynatrace log module pod is Running (Section 2).
-# Container logs are captured by the dynatrace-logmodule DaemonSet, which the
+# Container logs are captured by the log monitoring DaemonSet (pods named
+# <dynakube>-logmonitoring, image dynatrace-logmodule), which the
 # operator rolls out from the DynaKube's `logMonitoring` section. It tails
 # container stdout — no pod restart and no code injection are involved, which is
 # exactly the point Section 2 makes.
 checkLogModuleReady() {
-  [ -n "${LAB_WAIT:-}" ] && waitForPod dynatrace logmodule
+  [ -n "${LAB_WAIT:-}" ] && waitForPod dynatrace logmonitoring
   if kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -i logmonitoring | grep -q Running; then
     printInfo "Dynatrace log module is Running — your cluster's container logs are being captured"; return 0
   fi

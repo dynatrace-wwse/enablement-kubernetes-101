@@ -32,7 +32,7 @@ The TODO application should already be deployed in the `todoapp` namespace by th
 
 ### 2.1 Verify in the terminal
 
-In the workspace, above you'll find a button to start a new shell and connect to the training environment. Open it and type the following command:
+In the workspace toolbar you'll find a button that opens a new shell connected to your training environment. Open it and type the following command:
 
 ```bash
 kubectl get pods -n todoapp
@@ -40,9 +40,9 @@ kubectl get pods -n todoapp
 
 Expected output: one or more pods with status `Running`.
 
-### 2.1 Verify in the browser
+### 2.2 Verify in the browser
 
-In the workspace you'll find the registered apps, once it's registered you'll be able to open the app so you can interact with it. You'll see a button called "Open App". 
+The workspace also lists the applications running in your environment. Once the Todo app registers, an **Open App** button appears — use it to open the app in a new tab and interact with it.
 
 
 ![todoapp](img/todoapp.png) 

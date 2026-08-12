@@ -53,7 +53,7 @@ An instrumented application only produces data when someone uses it. So use it �
 
 ### Step 1 — Open your Todo app and add a task
 
-Go to workspace and open the Todo app, then add a couple of tasks. Since the application is now instrumented, Dynatrace is capturing and following all transactions. The requests are running through an instrumented process.
+Go to the workspace, open the Todo app, and add a couple of tasks — the text does not matter. The application is now instrumented, so every one of those requests runs through the injected OneAgent: each click produces a **log line** (the app logs every todo it accepts) and a **trace** (the request runs through an instrumented process).
 
 
 <!-- LAB_QUESTION
