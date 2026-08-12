@@ -3,11 +3,11 @@
   "id": "k8s-101-fundamentals",
   "category": "CO",
   "title": "Kubernetes 101 \u2014 Fundamentals",
-  "description": "Validate your understanding of Kubernetes and Dynatrace application monitoring as covered in this lab: pods, namespaces, kubectl, the Dynatrace Operator, and OneAgent injection.",
+  "description": "Validate your understanding of how Dynatrace monitors a Kubernetes cluster as covered in this lab: what the DynaKube and Operator do, why logs arrive without a restart, why traces require one, and how to prove each signal reached Grail.",
   "difficulty": "beginner",
   "estimatedTime": 8,
-  "imagine": "You just finished the Kubernetes 101 enablement. The TODO app is running on a k3d cluster, instrumented by Dynatrace OneAgent in AppOnly mode. You want to confirm you understood how everything fits together.",
-  "yourGoal": "Answer six questions about Kubernetes fundamentals and Dynatrace application monitoring as they applied to this lab.",
+  "imagine": "You just finished the Kubernetes 101 enablement. The TODO app is running on a k3d cluster, monitored by Dynatrace in Application Observability mode. You want to confirm you understood *how* Dynatrace got its data \u2014 not just the kubectl commands you typed.",
+  "yourGoal": "Answer questions that verify you understood what the DynaKube configures, what the Operator provisions, why log collection needed no restart while tracing did, and how to confirm each signal in Dynatrace.",
   "tools": [
     {
       "label": "kubectl"
@@ -23,166 +23,14 @@
     }
   ],
   "story": {
-    "introduction": "The lab deployed a k3d Kubernetes cluster with a TODO app and the Dynatrace Operator in AppOnly mode. These questions reinforce what each component does.",
-    "context": "Everything you need to answer can be found in the lab pages you just completed."
+    "introduction": "The lab deployed the Dynatrace Operator, then a DynaKube in Application Observability mode, on a k3d cluster running a TODO app. Logs started flowing immediately; traces only appeared after a rollout restart. These questions check that you understood why.",
+    "context": "Everything you need to answer can be found in the lab pages you just completed \u2014 especially the 'Your cluster is already capturing logs' and 'Verify the traces' sections."
   },
   "questions": [
     {
-      "id": "q1-namespace",
+      "id": "q1-dynakube-purpose",
       "type": "multiple-choice",
-      "title": "What is a Kubernetes namespace?",
-      "content": "The lab used two namespaces: `dynatrace` and `todoapp`. What is the main purpose of namespaces in Kubernetes?",
-      "options": [
-        {
-          "id": "a",
-          "text": "A logical partition that groups related resources and allows separate access control and resource quotas",
-          "isCorrect": true,
-          "explanation": "Correct! Namespaces let you isolate teams, applications, or environments within the same cluster."
-        },
-        {
-          "id": "b",
-          "text": "A physical network boundary that prevents pods from talking to each other",
-          "isCorrect": false,
-          "explanation": "Namespaces are logical, not physical. Pods across namespaces can still communicate unless blocked by NetworkPolicies."
-        },
-        {
-          "id": "c",
-          "text": "A separate Kubernetes cluster running inside the main cluster",
-          "isCorrect": false,
-          "explanation": "Namespaces share the same cluster control plane \u2014 they are not sub-clusters."
-        },
-        {
-          "id": "d",
-          "text": "A Docker image registry used by pods to pull container images",
-          "isCorrect": false,
-          "explanation": "Image registries are external. Namespaces are resource-grouping constructs within the cluster."
-        }
-      ],
-      "correctAnswer": "a",
-      "explanation": "Kubernetes namespaces partition cluster resources into isolated groups. In this lab, all Dynatrace components lived in `dynatrace` and the TODO app lived in `todoapp`.",
-      "hints": [
-        "Think about why `kubectl get pods -n dynatrace` and `kubectl get pods -n todoapp` return different results.",
-        "The key word is 'logical' \u2014 namespaces do not map to physical nodes."
-      ]
-    },
-    {
-      "id": "q2-kubectl-get-pods",
-      "type": "multiple-choice",
-      "title": "Listing pods in a namespace",
-      "content": "Which kubectl command lists all pods running in the `todoapp` namespace?",
-      "options": [
-        {
-          "id": "a",
-          "text": "kubectl get pods -n todoapp",
-          "isCorrect": true,
-          "explanation": "Correct! The -n flag selects the namespace."
-        },
-        {
-          "id": "b",
-          "text": "kubectl list pods --namespace=todoapp",
-          "isCorrect": false,
-          "explanation": "'list' is not a kubectl verb \u2014 use 'get'."
-        },
-        {
-          "id": "c",
-          "text": "kubectl describe pods todoapp",
-          "isCorrect": false,
-          "explanation": "describe shows details of a named resource, not a pod list across a namespace."
-        },
-        {
-          "id": "d",
-          "text": "kubectl pods --in todoapp",
-          "isCorrect": false,
-          "explanation": "Not valid kubectl syntax."
-        }
-      ],
-      "correctAnswer": "a",
-      "explanation": "kubectl uses verb-noun syntax. 'get pods' lists pods; '-n <namespace>' scopes the query to that namespace.",
-      "hints": [
-        "The verb you want is 'get'.",
-        "Namespace flag is -n or --namespace."
-      ]
-    },
-    {
-      "id": "q3-why-restart",
-      "type": "multiple-choice",
-      "title": "Why do pods need a restart after deploying OneAgent?",
-      "content": "In Section 3 you ran `kubectl rollout restart deployment -n todoapp`. Why is this restart necessary for Dynatrace instrumentation?",
-      "options": [
-        {
-          "id": "a",
-          "text": "The Dynatrace Operator needs a reboot to activate its licence",
-          "isCorrect": false,
-          "explanation": "Dynatrace licensing is not tied to pod restarts."
-        },
-        {
-          "id": "b",
-          "text": "OneAgent's mutating webhook only injects the agent into pods at their creation time, so existing pods must be restarted to pick up the injection",
-          "isCorrect": true,
-          "explanation": "Correct! The webhook intercepts new pods during scheduling. Pods that were already running before the DynaKube was applied never passed through the webhook."
-        },
-        {
-          "id": "c",
-          "text": "Kubernetes requires a full cluster restart whenever a new CRD is installed",
-          "isCorrect": false,
-          "explanation": "CRDs extend the API without requiring cluster or pod restarts."
-        },
-        {
-          "id": "d",
-          "text": "The TODO app needs to re-read the DT_ENVIRONMENT variable from a ConfigMap",
-          "isCorrect": false,
-          "explanation": "Environment variables alone don't instrument an application \u2014 the agent library must be injected into the process."
-        }
-      ],
-      "correctAnswer": "b",
-      "explanation": "Dynatrace uses a Kubernetes mutating admission webhook. Webhooks run at pod creation time, so any pods that were already running when the DynaKube was applied need to be recycled before the agent is injected.",
-      "hints": [
-        "Think about when Kubernetes calls a mutating webhook.",
-        "The annotation `oneagent.dynatrace.com/injected: true` is only present on pods that went through the webhook."
-      ]
-    },
-    {
-      "id": "q4-activegate-role",
-      "type": "multiple-choice",
-      "title": "What does the ActiveGate do?",
-      "content": "After applying the DynaKube, an ActiveGate pod started in the `dynatrace` namespace. What is the role of the ActiveGate?",
-      "options": [
-        {
-          "id": "a",
-          "text": "It is the Kubernetes API server proxy that the operator uses to watch for CRD changes",
-          "isCorrect": false,
-          "explanation": "The operator connects to the Kubernetes API server directly \u2014 the ActiveGate is not involved in that path."
-        },
-        {
-          "id": "b",
-          "text": "It acts as a secure communication gateway that routes monitoring data from OneAgent to your Dynatrace tenant",
-          "isCorrect": true,
-          "explanation": "Correct! The ActiveGate is a local relay. OneAgent sends data to the ActiveGate, which forwards it to the Dynatrace SaaS backend \u2014 reducing direct outbound connections from each node."
-        },
-        {
-          "id": "c",
-          "text": "It stores all collected metrics locally so the cluster works without internet access",
-          "isCorrect": false,
-          "explanation": "The ActiveGate forwards data to the tenant; it does not provide offline storage."
-        },
-        {
-          "id": "d",
-          "text": "It runs a Prometheus scrape loop that collects metrics from every pod",
-          "isCorrect": false,
-          "explanation": "The ActiveGate proxies Dynatrace protocol traffic, not Prometheus scrapes."
-        }
-      ],
-      "correctAnswer": "b",
-      "explanation": "The ActiveGate is a local routing proxy. OneAgent on each instrumented pod communicates with the local ActiveGate, which then securely forwards all observability data to the Dynatrace SaaS tenant.",
-      "hints": [
-        "Think about the data path: pod \u2192 ? \u2192 Dynatrace cloud.",
-        "The ActiveGate sits between OneAgent and the Dynatrace backend."
-      ]
-    },
-    {
-      "id": "q5-dynakube-purpose",
-      "type": "multiple-choice",
-      "title": "What is the DynaKube custom resource?",
+      "title": "What does the DynaKube custom resource do?",
       "content": "You applied a `dynakube.yaml` file in Section 2. What does the DynaKube CR tell the Dynatrace Operator?",
       "options": [
         {
@@ -195,82 +43,276 @@
           "id": "b",
           "text": "It is a Kubernetes secret that stores the DT_OPERATOR_TOKEN",
           "isCorrect": false,
-          "explanation": "Token secrets are a separate Kubernetes Secret object. The DynaKube CR defines the desired monitoring configuration."
+          "explanation": "Token secrets are a separate Kubernetes Secret object. The DynaKube CR defines the desired monitoring configuration, not credentials."
         },
         {
           "id": "c",
-          "text": "It defines the desired monitoring configuration: which tenant to connect to, which components to deploy (ActiveGate, CSI driver), and which instrumentation mode to use",
+          "text": "It is the single source of truth for how Dynatrace monitors the cluster: which tenant to connect to, which monitoring mode to run, and which components (ActiveGate, CSI driver, log module) to provision",
           "isCorrect": true,
-          "explanation": "Correct! The DynaKube CR is the single source of truth for how Dynatrace should monitor your cluster. The operator continuously reconciles the cluster state to match what the DynaKube defines."
+          "explanation": "Correct! Applying the DynaKube is what made the operator provision the ActiveGate, the log-monitoring DaemonSet, and the CSI driver / webhook for code-module injection \u2014 nothing runs until the DynaKube exists."
         },
         {
           "id": "d",
-          "text": "It is a NetworkPolicy that allows traffic from OneAgent to the internet",
+          "text": "It is a NetworkPolicy that allows traffic from the todoapp to the internet",
           "isCorrect": false,
           "explanation": "NetworkPolicies are a standard Kubernetes resource. The DynaKube is a Dynatrace-specific CRD for monitoring configuration."
         }
       ],
       "correctAnswer": "c",
-      "explanation": "The DynaKube Custom Resource is the control plane for Dynatrace observability. It specifies tenant credentials reference, monitoring mode (AppOnly in this lab), and which components to provision. The operator watches DynaKube objects and reconciles the cluster to match.",
+      "explanation": "The DynaKube CR is the control plane for Dynatrace observability. Before it existed, the operator was installed but idle. Once applied, the operator reconciled the cluster to match it: ActiveGate came up, the log module started tailing every node, and the CSI driver / mutating webhook were readied for the next pod that gets created.",
       "hints": [
-        "Think of the DynaKube like a deployment spec \u2014 it describes the desired state, and the operator makes it happen.",
-        "It references the secret that holds your DT_OPERATOR_TOKEN."
+        "Re-read the intro of Section 2 \u2014 'Without a DynaKube, the operator is installed but idle.'",
+        "Think of the DynaKube like a deployment spec: it describes desired state, and the operator makes it happen."
       ]
     },
     {
-      "id": "q6-oneagent-injection-proof",
+      "id": "q2-logs-no-restart",
       "type": "multiple-choice",
-      "title": "How do you confirm OneAgent was injected into a pod?",
-      "content": "After restarting the todoapp pods, what is the most direct way to confirm that OneAgent was successfully injected?",
+      "title": "Why did logs arrive without restarting the todoapp?",
+      "content": "The `todoapp` had been running since before the DynaKube was ever applied, yet its logs showed up in Grail without any restart or code change. Why?",
       "options": [
         {
           "id": "a",
-          "text": "Check that the pod has the annotation `oneagent.dynatrace.com/injected: \"true\"` set by the mutating webhook",
+          "text": "The log-monitoring module runs as a DaemonSet that tails the standard output of every container already running on the node \u2014 it works entirely from outside the application process",
           "isCorrect": true,
-          "explanation": "Correct! The mutating webhook stamps this annotation on every pod it successfully injects. Running `kubectl get pods -n todoapp -o yaml` and looking for this annotation is the definitive local check."
+          "explanation": "Correct! One log-monitoring pod per node reads the log files the container runtime already writes to disk. It never touches the application process, so pods don't need to be recreated for logs to start flowing."
         },
         {
           "id": "b",
-          "text": "Look for a new container named `oneagent` inside the pod",
+          "text": "The todoapp was coded to push its logs directly to the Dynatrace API",
           "isCorrect": false,
-          "explanation": "AppOnly mode uses init containers and a shared volume to inject code modules \u2014 it does not add a running sidecar container."
+          "explanation": "The lab explicitly calls out 'no change to your application \u2014 no logging library, no sidecar, no log driver'."
+        },
+        {
+          "id": "c",
+          "text": "Kubernetes automatically restarted the todoapp pods when the DynaKube was applied",
+          "isCorrect": false,
+          "explanation": "Applying a DynaKube does not trigger restarts of unrelated workloads in other namespaces."
+        },
+        {
+          "id": "d",
+          "text": "OneAgent was already injected into the todoapp before the lab began",
+          "isCorrect": false,
+          "explanation": "The lab states the todoapp 'has never been restarted or instrumented' at that point \u2014 injection requires the mutating webhook, which only fires on pod creation."
+        }
+      ],
+      "correctAnswer": "a",
+      "explanation": "Log collection needs no application restart, no code injection, and no change to your application \u2014 the log-monitoring DaemonSet reads container log files from the node itself. That is fundamentally different from how traces are captured, which is why the very next section required a restart.",
+      "hints": [
+        "The lab page title is literally 'Your cluster is already capturing logs'.",
+        "Logs come from outside the process; traces come from inside it."
+      ]
+    },
+    {
+      "id": "q3-why-restart-for-traces",
+      "type": "multiple-choice",
+      "title": "Why do pods need a restart to produce traces?",
+      "content": "In Section 3 you ran `kubectl rollout restart deployment -n todoapp` before any trace data appeared. Why is a restart required for tracing but not for logging?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The Dynatrace Operator needs a reboot to activate its licence",
+          "isCorrect": false,
+          "explanation": "Dynatrace licensing is not tied to pod restarts."
+        },
+        {
+          "id": "b",
+          "text": "Tracing requires the OneAgent code module to run inside the application process itself, and the mutating webhook can only inject it at the moment a pod is created \u2014 pods already running before the DynaKube existed never passed through that webhook",
+          "isCorrect": true,
+          "explanation": "Correct! Distributed tracing needs code-level visibility into the running process. That code module is delivered by the CSI driver and wired in by the mutating webhook, which only intercepts pods at creation time \u2014 so existing pods must be recreated to be instrumented."
+        },
+        {
+          "id": "c",
+          "text": "Kubernetes requires a full cluster restart whenever a new CRD is installed",
+          "isCorrect": false,
+          "explanation": "CRDs extend the API without requiring cluster or pod restarts."
+        },
+        {
+          "id": "d",
+          "text": "The todoapp needs to re-read a DT_ENVIRONMENT variable from a ConfigMap to enable tracing",
+          "isCorrect": false,
+          "explanation": "Environment variables alone don't instrument an application \u2014 the agent's code module must be injected into the running process by the webhook."
+        }
+      ],
+      "correctAnswer": "b",
+      "explanation": "Logs are read from outside the process (log files on the node), so no restart is needed. Traces require the agent to run inside the process, and Dynatrace injects that agent via a mutating webhook that only fires when a pod is created \u2014 so a rollout restart is the only way to get already-running pods instrumented.",
+      "hints": [
+        "Think about when Kubernetes calls a mutating webhook \u2014 only at pod creation.",
+        "The annotation `oneagent.dynatrace.com/injected: true` only appears on pods that went through the webhook after the DynaKube existed."
+      ]
+    },
+    {
+      "id": "q4-injection-proof",
+      "type": "multiple-choice",
+      "title": "How do you confirm OneAgent was injected into a pod?",
+      "content": "After restarting the todoapp pods, what is the most direct way to confirm that the OneAgent code module was successfully injected?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Check that the pod carries the annotation `oneagent.dynatrace.com/injected: \"true\"`, stamped by the mutating webhook at pod creation",
+          "isCorrect": true,
+          "explanation": "Correct! This annotation is the definitive local proof of injection \u2014 it is exactly what the lab's shell validation (`checkOneAgentInjected`) checks for."
+        },
+        {
+          "id": "b",
+          "text": "Look for a new container named `oneagent` running inside the pod",
+          "isCorrect": false,
+          "explanation": "Application Observability mode injects a code module via an init container and shared volume \u2014 it does not add a permanent running sidecar container."
         },
         {
           "id": "c",
           "text": "Check that the pod's CPU usage doubled after the restart",
           "isCorrect": false,
-          "explanation": "OneAgent has minimal CPU overhead and CPU usage is not a reliable injection indicator."
+          "explanation": "OneAgent has minimal CPU overhead; CPU usage is not a reliable injection indicator."
         },
         {
           "id": "d",
           "text": "The Dynatrace Operator logs will print 'injection complete' for each pod",
           "isCorrect": false,
-          "explanation": "The injection is handled by the mutating webhook, not the operator controller \u2014 and the evidence lives in the pod annotation."
+          "explanation": "Injection is handled by the mutating webhook at admission time, not printed by the operator controller \u2014 the evidence lives in the pod annotation."
         }
       ],
       "correctAnswer": "a",
-      "explanation": "The annotation `oneagent.dynatrace.com/injected: \"true\"` is stamped by the Dynatrace mutating webhook at pod admission time. It is the canonical proof that the agent was injected. In this lab the shell validation used `kubectl get pods -n todoapp -o jsonpath=...` to check exactly this.",
+      "explanation": "The annotation `oneagent.dynatrace.com/injected: \"true\"` is stamped by the Dynatrace mutating webhook at pod admission time. It is the canonical, local proof that the agent was injected \u2014 before you ever go looking for traces in Grail.",
       "hints": [
         "The lab's shell validation for Section 3 checked this exact annotation.",
         "Run `kubectl describe pod <pod-name> -n todoapp` and look at the Annotations section."
+      ]
+    },
+    {
+      "id": "q5-verify-logs-dql",
+      "type": "multiple-choice",
+      "title": "How do you verify a log reached Dynatrace?",
+      "content": "After adding a todo, which DQL query correctly verifies that its log line reached Grail, scoped to your own cluster session?",
+      "options": [
+        {
+          "id": "a",
+          "text": "fetch logs, from:now()-15m | filter endsWith(k8s.cluster.name, \"{{DT_SESSION_ID}}\") | filter contains(content, \"Adding a new todo\")",
+          "isCorrect": true,
+          "explanation": "Correct! `fetch logs` reads the logs data lakehouse table, and `endsWith(k8s.cluster.name, ...)` scopes results to your unique cluster session so classmates sharing the tenant don't pollute each other's results."
+        },
+        {
+          "id": "b",
+          "text": "fetch spans, from:now()-15m | filter k8s.namespace.name == \"todoapp\"",
+          "isCorrect": false,
+          "explanation": "`fetch spans` queries distributed traces, not logs \u2014 it would not surface the log content produced by the app."
+        },
+        {
+          "id": "c",
+          "text": "kubectl logs -n todoapp deployment/todoapp | grep Grail",
+          "isCorrect": false,
+          "explanation": "That only shows local container stdout \u2014 it does not confirm the data reached the Dynatrace Grail backend."
+        },
+        {
+          "id": "d",
+          "text": "fetch logs, from:now()-15m | filter k8s.cluster.name == \"{{DT_SESSION_ID}}\"",
+          "isCorrect": false,
+          "explanation": "An exact `==` match fails because Kubernetes truncates long cluster names \u2014 the training-name prefix gets cut, but the session id at the end survives. `endsWith` is required."
+        }
+      ],
+      "correctAnswer": "a",
+      "explanation": "Logs live in the `logs` data lakehouse table. `fetch logs` combined with `endsWith(k8s.cluster.name, \"{{DT_SESSION_ID}}\")` and a content filter is exactly what the lab used to prove the log-monitoring module shipped your todo's log line \u2014 with zero code changes to the app.",
+      "hints": [
+        "Logs and traces live in different DQL tables: `logs` vs `spans`.",
+        "Remember why the lab used `endsWith` instead of `==` on `k8s.cluster.name`."
+      ]
+    },
+    {
+      "id": "q6-verify-traces-dql",
+      "type": "multiple-choice",
+      "title": "How do you verify a trace reached Dynatrace?",
+      "content": "After adding a todo (post-restart), which DQL table do you query to confirm the injected agent captured a distributed trace for that request?",
+      "options": [
+        {
+          "id": "a",
+          "text": "fetch logs",
+          "isCorrect": false,
+          "explanation": "`fetch logs` reads log lines, not distributed traces \u2014 traces are a separate signal captured by the injected code module."
+        },
+        {
+          "id": "b",
+          "text": "fetch spans",
+          "isCorrect": true,
+          "explanation": "Correct! `fetch spans, from:now()-15m | filter endsWith(k8s.cluster.name, \"{{DT_SESSION_ID}}\")` surfaces the `POST /todos` root span recorded by OneAgent from inside the running process \u2014 the signal that did not exist before the restart."
+        },
+        {
+          "id": "c",
+          "text": "fetch events",
+          "isCorrect": false,
+          "explanation": "Events capture things like deployments or problems, not per-request distributed traces."
+        },
+        {
+          "id": "d",
+          "text": "fetch metrics",
+          "isCorrect": false,
+          "explanation": "Metrics are aggregated numeric time series, not individual request traces with span names and endpoints."
+        }
+      ],
+      "correctAnswer": "b",
+      "explanation": "Traces are recorded as spans by the code module running inside the instrumented process, and queried with `fetch spans`. Each span carries the same `k8s.cluster.name` / `k8s.namespace.name` / `k8s.workload.name` context as the logs \u2014 that shared metadata is what lets Dynatrace stitch Kubernetes identity onto every signal, and what let you scope the query to your own cluster.",
+      "hints": [
+        "This is 'the signal that did not exist before the restart' \u2014 recheck the 'Verify the traces' section.",
+        "Traces are made of spans; a root span here is named `POST /todos`."
+      ]
+    },
+    {
+      "id": "q7-activegate-role",
+      "type": "multiple-choice",
+      "title": "What does the ActiveGate do?",
+      "content": "After applying the DynaKube, an ActiveGate pod started in the `dynatrace` namespace. What is its role in getting logs and traces from your cluster to Dynatrace?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It is the Kubernetes API server proxy that the operator uses to watch for CRD changes",
+          "isCorrect": false,
+          "explanation": "The operator connects to the Kubernetes API server directly \u2014 the ActiveGate is not involved in that path."
+        },
+        {
+          "id": "b",
+          "text": "It acts as a secure gateway that routes observability data (logs, traces, metrics) collected in the cluster to your Dynatrace tenant",
+          "isCorrect": true,
+          "explanation": "Correct! The ActiveGate is a local routing proxy: the log module and the injected agents send their data to it, and it securely forwards everything to the Dynatrace SaaS backend."
+        },
+        {
+          "id": "c",
+          "text": "It stores all collected data locally so the cluster works without internet access",
+          "isCorrect": false,
+          "explanation": "The ActiveGate forwards data onward to the tenant; it is not a permanent offline data store."
+        },
+        {
+          "id": "d",
+          "text": "It injects the OneAgent code module into application pods",
+          "isCorrect": false,
+          "explanation": "That is the job of the CSI driver and mutating webhook, not the ActiveGate."
+        }
+      ],
+      "correctAnswer": "b",
+      "explanation": "The ActiveGate is the local relay between everything running in your cluster (log module DaemonSet, injected code modules) and the Dynatrace tenant. Both the logs and the traces you verified in Grail traveled through it.",
+      "hints": [
+        "Think about the data path: log module / injected agent \u2192 ? \u2192 Dynatrace tenant.",
+        "The ActiveGate sits between the components you deployed and the Dynatrace backend."
       ]
     }
   ],
   "tags": [
     "kubernetes",
     "k8s",
-    "kubectl",
     "dynatrace",
+    "dynakube",
     "oneagent",
     "apponly",
-    "operator"
+    "operator",
+    "logs",
+    "traces",
+    "grail"
   ],
   "learningObjectives": [
-    "Explain the role of Kubernetes namespaces",
-    "Use kubectl to inspect pods in a specific namespace",
-    "Describe why a pod restart is needed after deploying OneAgent in AppOnly mode",
-    "Explain the role of the ActiveGate in the Dynatrace data path",
-    "Understand what the DynaKube custom resource defines",
-    "Identify the pod annotation that confirms OneAgent injection"
+    "Explain what the DynaKube custom resource configures and why the operator does nothing without one",
+    "Explain why log collection requires no restart or code change to the application",
+    "Explain why distributed tracing requires a pod restart after the DynaKube is applied",
+    "Identify the pod annotation that confirms OneAgent code-module injection",
+    "Write a DQL query to verify logs reached Grail, scoped to your cluster session",
+    "Write a DQL query to verify traces (spans) reached Grail",
+    "Describe the role of the ActiveGate in routing observability data to the Dynatrace tenant"
   ]
 }
