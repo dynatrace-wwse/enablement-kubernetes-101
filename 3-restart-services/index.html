@@ -418,15 +418,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-verify-in-dynatrace" class="md-nav__link">
-    <span class="md-ellipsis">
-      Step 3 — Verify in Dynatrace
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#validation-oneagent-injected" class="md-nav__link">
     <span class="md-ellipsis">
       Validation — OneAgent injected
@@ -436,28 +427,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verify-logs-reach-grail-end-to-end" class="md-nav__link">
+  <a href="#use-the-application" class="md-nav__link">
     <span class="md-ellipsis">
-      Verify logs reach Grail (end-to-end)
+      Use the application
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Verify logs reach Grail (end-to-end)">
+    <nav class="md-nav" aria-label="Use the application">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#step-1-generate-a-uniquely-tagged-log-line" class="md-nav__link">
+  <a href="#step-1-open-your-todo-app-and-add-a-task" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 1 — Generate a uniquely-tagged log line
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#step-2-confirm-the-tagged-log-arrived-in-grail" class="md-nav__link">
-    <span class="md-ellipsis">
-      Step 2 — Confirm the tagged log arrived in Grail
+      Step 1 — Open your Todo app and add a task
     </span>
   </a>
   
@@ -465,6 +447,24 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify-the-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verify the log
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify-the-traces" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verify the traces
+    </span>
+  </a>
   
 </li>
       
@@ -568,15 +568,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-verify-in-dynatrace" class="md-nav__link">
-    <span class="md-ellipsis">
-      Step 3 — Verify in Dynatrace
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#validation-oneagent-injected" class="md-nav__link">
     <span class="md-ellipsis">
       Validation — OneAgent injected
@@ -586,28 +577,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verify-logs-reach-grail-end-to-end" class="md-nav__link">
+  <a href="#use-the-application" class="md-nav__link">
     <span class="md-ellipsis">
-      Verify logs reach Grail (end-to-end)
+      Use the application
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Verify logs reach Grail (end-to-end)">
+    <nav class="md-nav" aria-label="Use the application">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#step-1-generate-a-uniquely-tagged-log-line" class="md-nav__link">
+  <a href="#step-1-open-your-todo-app-and-add-a-task" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 1 — Generate a uniquely-tagged log line
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#step-2-confirm-the-tagged-log-arrived-in-grail" class="md-nav__link">
-    <span class="md-ellipsis">
-      Step 2 — Confirm the tagged log arrived in Grail
+      Step 1 — Open your Todo app and add a task
     </span>
   </a>
   
@@ -615,6 +597,24 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify-the-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verify the log
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verify-the-traces" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verify the traces
+    </span>
+  </a>
   
 </li>
       
@@ -655,9 +655,16 @@
 
 
 <h1 id="section-3-restart-application-services">Section 3 — Restart Application Services<a class="headerlink" href="#section-3-restart-application-services" title="Permanent link">#</a></h1>
-<p>The Dynatrace OneAgent injects itself into processes at startup time. Pods that were already running <strong>before</strong> the OneAgent DaemonSet was deployed will not be instrumented until they are restarted. This is a normal part of the OneAgent lifecycle.</p>
+<p>In the previous section your cluster started sending <strong>logs</strong> without you touching the application at all. <strong>Traces are different.</strong> To trace a request, Dynatrace has to run <em>inside</em> your application process — and a process can only be instrumented at the moment it starts.</p>
+<p>Your <code>todoapp</code> has been running since before you deployed the DynaKube, so it started without the agent. Restart it, and the new pods come up instrumented.</p>
 <h2 id="why-a-restart-is-needed">Why a restart is needed<a class="headerlink" href="#why-a-restart-is-needed" title="Permanent link">#</a></h2>
-<p>When a pod starts, OneAgent's init container intercepts the process and injects the agent library. Pods that existed before OneAgent was deployed never went through this injection step, so restarting them triggers the injection.</p>
+<p>In Application Observability mode there is no OneAgent DaemonSet on your nodes. Instead:</p>
+<ol>
+<li>Dynatrace registers a <strong>mutating webhook</strong> in your cluster.</li>
+<li>Every time a pod is <em>created</em>, the webhook rewrites its spec to mount the OneAgent code module (delivered by the <strong>CSI driver</strong>) and to load it into the application process.</li>
+<li>Pods that already existed never passed through that webhook — so they are not instrumented, and never will be until they are recreated.</li>
+</ol>
+<p>A rolling restart recreates them, which is all it takes.</p>
 <h2 id="step-1-restart-all-deployments-in-todoapp">Step 1 — Restart all deployments in todoapp<a class="headerlink" href="#step-1-restart-all-deployments-in-todoapp" title="Permanent link">#</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>todoapp
 </span></code></pre></div>
@@ -666,8 +673,6 @@
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>status<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>todoapp<span class="w"> </span>--timeout<span class="o">=</span>120s
 </span></code></pre></div>
 <p>When the rollout finishes, the new pods will have been started with OneAgent already injected.</p>
-<h2 id="step-3-verify-in-dynatrace">Step 3 — Verify in Dynatrace<a class="headerlink" href="#step-3-verify-in-dynatrace" title="Permanent link">#</a></h2>
-<p>Open your Dynatrace tenant and navigate to <strong>Services</strong> or <strong>Kubernetes</strong> — within a few minutes you should see the <code>todoapp</code> service and its processes appearing automatically, with distributed traces flowing in.</p>
 <h2 id="validation-oneagent-injected">Validation — OneAgent injected<a class="headerlink" href="#validation-oneagent-injected" title="Permanent link">#</a></h2>
 <p>The check below verifies that the restarted pods have the <code>oneagent.dynatrace.com/injected: "true"</code> annotation set by the mutating webhook. This annotation is the definitive proof that the agent was successfully injected at pod startup.</p>
 <!-- LAB_QUESTION
@@ -681,69 +686,90 @@ hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab a
 explanation: "OneAgent injected — the todoapp pods have the `oneagent.dynatrace.com/injected: true` annotation confirming agent injection at startup."
 -->
 
+<h2 id="use-the-application">Use the application<a class="headerlink" href="#use-the-application" title="Permanent link">#</a></h2>
+<p>An instrumented application only produces data when someone uses it. So use it — add a todo.</p>
+<h3 id="step-1-open-your-todo-app-and-add-a-task">Step 1 — Open your Todo app and add a task<a class="headerlink" href="#step-1-open-your-todo-app-and-add-a-task" title="Permanent link">#</a></h3>
+<p>Go to the workspace, open the Todo app, and add a couple of tasks — the text does not matter. The application is now instrumented, so every one of those requests runs through the injected OneAgent: each click produces a <strong>log line</strong> (the app logs every todo it accepts) and a <strong>trace</strong> (the request runs through an instrumented process).</p>
+<!-- LAB_QUESTION
+type: shell-verification
+question: "Confirm the app accepts a new todo"
+buttonText: "Add a todo for me"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && generateTodoTraffic"
+expect:
+  operator: exit-zero
+hint: "Needs the todoapp reachable via the ingress. If the endpoint is not answering yet, wait a moment and try again."
+explanation: "A todo was created — its log line and its trace should reach Grail within ~2 minutes."
+-->
+
+<h2 id="verify-the-log">Verify the log<a class="headerlink" href="#verify-the-log" title="Permanent link">#</a></h2>
+<p>The app logs each todo it accepts, with the title you typed:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>com.dynatrace.todoapp.TodoController : Adding a new todo: TodoRecord{title=&#39;...&#39;}
+</span></code></pre></div>
+<p>The <code>endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")</code> filter scopes the query to <strong>your</strong> cluster — every session gets a unique cluster identity ending in your session id, so classmates running this training against the same tenant never pollute your results.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>fetch logs, from:now()-15m
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>| filter endsWith(k8s.cluster.name, &quot;{{DT_SESSION_ID}}&quot;)
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>| filter k8s.namespace.name == &quot;todoapp&quot;
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>| filter contains(content, &quot;Adding a new todo&quot;)
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>| fields timestamp, content
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>| limit 5
+</span></code></pre></div>
+<!-- LAB_QUESTION
+type: dql-verification
+question: "Verify the log line for your todo reached Dynatrace Grail"
+buttonText: "Check logs in Grail"
+dql: |
+  fetch logs, from:now()-15m
+  | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+  | filter k8s.namespace.name == "todoapp"
+  | filter contains(content, "Adding a new todo")
+  | limit 1
+expect:
+  operator: not-empty
+hint: "Add a todo first (previous step). Logs take ~1–2 minutes to reach Grail — if nothing is found yet, wait a moment and check again."
+explanation: "Your todo's log line is in Grail — captured by the log module, with no code change to the application."
+-->
+
+<h2 id="verify-the-traces">Verify the traces<a class="headerlink" href="#verify-the-traces" title="Permanent link">#</a></h2>
+<p>This is the signal that did <strong>not</strong> exist before the restart. Adding a todo sends a <code>POST /todos</code> request, and the injected OneAgent now records it as a distributed trace — a root span named <code>POST /todos</code>, resolved to the <code>addTodo</code> endpoint of the application.</p>
+<p>Notice that the span carries the same Kubernetes context as the log (<code>k8s.cluster.name</code>, <code>k8s.namespace.name</code>, <code>k8s.workload.name</code>). That is metadata enrichment: Dynatrace stitches cluster identity onto the telemetry, which is exactly what lets you scope this query to your own cluster.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>fetch spans, from:now()-15m
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>| filter endsWith(k8s.cluster.name, &quot;{{DT_SESSION_ID}}&quot;)
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>| filter k8s.namespace.name == &quot;todoapp&quot;
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>| fields start_time, span.name, endpoint.name, duration, k8s.workload.name
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>| limit 5
+</span></code></pre></div>
+<!-- LAB_QUESTION
+type: dql-verification
+question: "Verify the trace for your todo request reached Dynatrace Grail"
+buttonText: "Check traces in Grail"
+dql: |
+  fetch spans, from:now()-15m
+  | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+  | filter k8s.namespace.name == "todoapp"
+  | limit 1
+expect:
+  operator: not-empty
+hint: "Traces only exist for pods restarted AFTER the DynaKube was applied — confirm the injection check above passed, then add another todo and wait ~1–2 minutes."
+explanation: "The trace is in Grail — the request was recorded from inside the application process, which is what the restart made possible."
+-->
+
 <!-- LAB_SOLUTION
 reveal: |
   Restart the application so its pods pass through the OneAgent mutating webhook
   and get instrumented:
 
-  <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>todoapp
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>status<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>todoapp<span class="w"> </span>--timeout<span class="o">=</span>120s
+  <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>todoapp
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>status<span class="w"> </span>deployment<span class="w"> </span>-n<span class="w"> </span>todoapp<span class="w"> </span>--timeout<span class="o">=</span>120s
 </span></code></pre></div>
 
   The "Run solution" button runs both commands and confirms the restarted pods carry
-  the `oneagent.dynatrace.com/injected: "true"` annotation.
+  the `oneagent.dynatrace.com/injected: "true"` annotation. It also generates traffic so spans are captured.
 commands:
-  - kubectl rollout restart deployment -n todoapp && kubectl rollout status deployment -n todoapp --timeout=120s
+  - kubectl rollout restart deployment -n todoapp && kubectl rollout status deployment -n todoapp --timeout=120s && generateTodoTraffic
 verify:
   - "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkOneAgentInjected"
 -->
 
-<h2 id="verify-logs-reach-grail-end-to-end">Verify logs reach Grail (end-to-end)<a class="headerlink" href="#verify-logs-reach-grail-end-to-end" title="Permanent link">#</a></h2>
-<p>This is the real end-to-end signal: app → OneAgent → Dynatrace Grail. We generate a <strong>uniquely-tagged</strong> TODO via the app's HTTP API, then confirm <em>that specific</em> log line arrives in Grail — so no other todo activity (or a previous run) can give a false pass.</p>
-<h3 id="step-1-generate-a-uniquely-tagged-log-line">Step 1 — Generate a uniquely-tagged log line<a class="headerlink" href="#step-1-generate-a-uniquely-tagged-log-line" title="Permanent link">#</a></h3>
-<p><code>generateTodoTraffic</code> waits for the app's HTTP endpoint to answer, then creates a TODO whose title carries the tag <code>K8S101LOGPROBE</code> plus a per-run nonce (the same CURL path the Live Debugger lab uses to add a task). The app logs the title, so the tag lands in the log content.</p>
-<!-- LAB_QUESTION
-type: shell-verification
-question: "Generate a uniquely-tagged TODO so we can verify its log reaches Grail"
-buttonText: "Generate tagged log"
-command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && generateTodoTraffic"
-expect:
-  operator: exit-zero
-hint: "Needs OneAgent injected (previous step) and the todoapp reachable via the ingress. The check POSTs the tagged TODO immediately — if the endpoint is not reachable yet, wait a moment and try again."
-explanation: "A uniquely-tagged TODO was created — its log line should reach Grail within ~2 minutes."
--->
-
-<h3 id="step-2-confirm-the-tagged-log-arrived-in-grail">Step 2 — Confirm the tagged log arrived in Grail<a class="headerlink" href="#step-2-confirm-the-tagged-log-arrived-in-grail" title="Permanent link">#</a></h3>
-<p>This DQL matches <strong>only</strong> the tagged probe log from the last 15 minutes — generic <code>Adding a new todo</code> logs and older runs are filtered out. The check button retries while the log makes its way to Grail.</p>
-<p>The <code>k8s.cluster.name</code> filter scopes the query to <strong>your</strong> cluster: every session gets a unique cluster identity ending in your session id (<code>{{DT_SESSION_ID}}</code>), so classmates running this training against the same tenant never pollute your results.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>fetch logs
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>| filter endsWith(k8s.cluster.name, &quot;{{DT_SESSION_ID}}&quot;)
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>| filter k8s.namespace.name == &quot;todoapp&quot;
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>| filter contains(content, &quot;K8S101LOGPROBE&quot;)
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>| filter timestamp &gt; now() - 15m
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>| limit 5
-</span></code></pre></div>
-<!-- LAB_QUESTION
-type: dql-verification
-question: "Verify the uniquely-tagged TODO log reached Dynatrace Grail"
-buttonText: "Check tagged log in Grail"
-dql: |
-  fetch logs
-  | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
-  | filter k8s.namespace.name == "todoapp"
-  | filter contains(content, "K8S101LOGPROBE")
-  | filter timestamp > now() - 15m
-  | limit 1
-expect:
-  operator: not-empty
-hint: "Run the previous step first. Logs take ~1–2 minutes to reach Grail — if nothing is found yet, wait a moment and check again."
-explanation: "The tagged log reached Grail — the full app → OneAgent → Grail pipeline is verified end-to-end."
--->
-
-<div class="admonition tip">
-<p class="admonition-title">Why the tag and the cluster filter</p>
-<p>Matching <code>K8S101LOGPROBE</code> (a probe-only marker) instead of the generic <code>Adding a new todo</code> guarantees the log came from <strong>this</strong> verification step, and the <code>now() - 15m</code> window keeps a previous run from giving a false pass. The <code>endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")</code> filter guarantees it came from <strong>your</strong> cluster — not a classmate's — when many sessions share one tenant.</p>
-</div>
 <h2 id="explore-your-services-in-dynatrace">Explore your services in Dynatrace<a class="headerlink" href="#explore-your-services-in-dynatrace" title="Permanent link">#</a></h2>
 <p>Now that the application is instrumented, use the Dynatrace Services App to see the automatically discovered services, performance indicators, and distributed traces from the <code>todoapp</code> namespace.</p>
 <p><a href="placeholder">dt-app|dynatrace.services|Open Services App</a></p>

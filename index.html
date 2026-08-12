@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Instrument a live Kubernetes cluster with Dynatrace from scratch — deploy the Operator, configure a DynaKube, and observe full-stack metrics, traces, and logs.">
+        <meta name="description" content="Instrument a live Kubernetes cluster with Dynatrace from scratch — deploy the Operator, configure a DynaKube, and watch logs, traces, and metrics arrive in Grail.">
       
       
       
@@ -523,13 +523,13 @@
 </tr>
 <tr>
 <td>2</td>
-<td>Deploy the <strong>DynaKube</strong> custom resource from the Dynatrace UI</td>
-<td>DynaKube object exists; ActiveGate pod is <code>Running</code></td>
+<td>Deploy the <strong>DynaKube</strong> custom resource</td>
+<td>DynaKube object exists; ActiveGate is <code>Running</code>; logs arrive in Grail with no restart</td>
 </tr>
 <tr>
 <td>3</td>
 <td><strong>Restart</strong> the application services to pick up instrumentation</td>
-<td>Application pods come back <code>Running</code> with the agent injected</td>
+<td>Agent injected; your todo's log line and trace arrive in Grail</td>
 </tr>
 </tbody>
 </table>

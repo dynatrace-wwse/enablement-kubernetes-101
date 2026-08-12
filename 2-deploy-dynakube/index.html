@@ -440,6 +440,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#your-cluster-is-already-capturing-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Your cluster is already capturing logs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Your cluster is already capturing logs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#validation-the-log-module-is-running" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validation — the log module is running
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation-logs-are-arriving-in-grail" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validation — logs are arriving in Grail
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#explore-your-cluster-in-dynatrace" class="md-nav__link">
     <span class="md-ellipsis">
       Explore your cluster in Dynatrace
@@ -592,6 +625,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#your-cluster-is-already-capturing-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Your cluster is already capturing logs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Your cluster is already capturing logs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#validation-the-log-module-is-running" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validation — the log module is running
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation-logs-are-arriving-in-grail" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validation — logs are arriving in Grail
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#explore-your-cluster-in-dynatrace" class="md-nav__link">
     <span class="md-ellipsis">
       Explore your cluster in Dynatrace
@@ -660,6 +726,49 @@ commands:
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>dynatrace<span class="w"> </span>--watch
 </span></code></pre></div>
 <p>Wait until all pods show <code>Running</code> before continuing.</p>
+<details class="tip">
+<summary>Watch with K9S</summary>
+<p><a href="https://k9scli.io/">K9S</a> is a terminal-based Kubernetes UI that lets you watch and manage your Kubernetes clusters with style. Launch it with <code>k9s</code>, then navigate to the <code>dynatrace</code> namespace to see the dynatrace components updating live.</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Command / Shortcut</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Launch K9S</td>
+<td><code>k9s</code></td>
+</tr>
+<tr>
+<td>List pods in a namespace</td>
+<td><code>:pods</code> → type namespace filter, e.g. <code>dynatrace</code></td>
+</tr>
+<tr>
+<td>List all namespaces</td>
+<td><code>:namespaces</code></td>
+</tr>
+<tr>
+<td>View DynaKube custom resource</td>
+<td><code>:dynakube</code> → select the resource to inspect it</td>
+</tr>
+<tr>
+<td>Describe a deployment</td>
+<td><code>:deployments</code> → select one → press <code>d</code></td>
+</tr>
+<tr>
+<td>Shell into a container</td>
+<td>Select a pod → press <code>s</code></td>
+</tr>
+<tr>
+<td>Quit</td>
+<td><code>:q</code> or <code>Ctrl+C</code></td>
+</tr>
+</tbody>
+</table>
+<p><img alt="K9S showing DynaKube and pods" src="../img/k9s_dynatrace.png" /></p>
+</details>
 <h2 id="validation-dynakube-object-exists">Validation — DynaKube object exists<a class="headerlink" href="#validation-dynakube-object-exists" title="Permanent link">#</a></h2>
 <!-- LAB_QUESTION
 type: shell-verification
@@ -682,6 +791,55 @@ expect:
   operator: exit-zero
 hint: "The ActiveGate pod may take 1–2 minutes to start after the DynaKube is applied. Watch `kubectl get pods -n dynatrace` and check again once it is Running."
 explanation: "ActiveGate is Running — your cluster is connected to the Dynatrace tenant and data will start flowing."
+-->
+
+<h2 id="your-cluster-is-already-capturing-logs">Your cluster is already capturing logs<a class="headerlink" href="#your-cluster-is-already-capturing-logs" title="Permanent link">#</a></h2>
+<p>Here is the part people expect to be harder than it is: <strong>there is nothing left for you to do.</strong></p>
+<p>The DynaKube you just applied enables the <a href="https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment/k8s-log-monitoring">Log Monitoring module</a>. The operator rolls out a log monitoring DaemonSet — its pods are named after your DynaKube, ending in <code>-logmonitoring</code> — one pod per node, and that pod tails the standard output of <strong>every container on the node</strong> straight from the node's log files.</p>
+<p>That means log collection needs:</p>
+<ul>
+<li><strong>no application restart</strong> — the log module reads files the container runtime already writes;</li>
+<li><strong>no code injection</strong> — it never touches your application process;</li>
+<li><strong>no change to your application</strong> — no logging library, no sidecar, no log driver.</li>
+</ul>
+<p>This is worth pausing on, because the <em>next</em> section is different: traces <strong>do</strong> require a restart, because the agent has to be injected into the process at startup. Logs come from outside the process; traces come from inside it.</p>
+<h3 id="validation-the-log-module-is-running">Validation — the log module is running<a class="headerlink" href="#validation-the-log-module-is-running" title="Permanent link">#</a></h3>
+<!-- LAB_QUESTION
+type: shell-verification
+question: "Verify the Dynatrace log module is running on your cluster"
+buttonText: "Check log module"
+command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkLogModuleReady"
+expect:
+  operator: exit-zero
+hint: "The log module DaemonSet is rolled out by the operator a few moments after the DynaKube is applied. Watch `kubectl get pods -n dynatrace` and check again once a `logmonitoring` pod is Running."
+explanation: "The log module is Running — every container's stdout on this node is now being shipped to Dynatrace."
+-->
+
+<h3 id="validation-logs-are-arriving-in-grail">Validation — logs are arriving in Grail<a class="headerlink" href="#validation-logs-are-arriving-in-grail" title="Permanent link">#</a></h3>
+<p>The <code>todoapp</code> has been running since your environment started, and has never been restarted or instrumented — so any log line it produces is proof that the log module alone is doing the work.</p>
+<p>The <code>endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")</code> filter scopes the query to <strong>your</strong> cluster. Every session gets a unique cluster identity ending in your session id, so classmates running this training against the same tenant never pollute your results.</p>
+<p>The query below counts the log lines collected from your cluster in the last 30 minutes, grouped by namespace and log level. The result is a small table that proves something bigger than "logs arrive": <strong>every namespace on the cluster is shipping logs</strong> — the demo app, the Dynatrace components, the system namespaces — all without touching a single one of them.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>fetch logs, from:now()-30m
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>| filter endsWith(k8s.cluster.name, &quot;{{DT_SESSION_ID}}&quot;)
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>| summarize count = count(), by: {namespace = k8s.namespace.name, level = loglevel}
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>| sort namespace asc, count desc
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Why <code>endsWith</code> and not <code>==</code></p>
+<p>Your cluster is named after the training plus your session id, but Kubernetes caps how long that name can be — so the <em>training</em> half gets truncated while your session id stays intact at the end. <code>endsWith</code> matches the part that is guaranteed to survive.</p>
+</div>
+<!-- LAB_QUESTION
+type: dql-verification
+question: "Verify your cluster's container logs are reaching Dynatrace Grail"
+buttonText: "Check logs in Grail"
+dql: |
+  fetch logs, from:now()-15m
+  | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+  | limit 1
+expect:
+  operator: not-empty
+hint: "The log module needs to be Running first (previous check), and logs take ~1–2 minutes to reach Grail. Wait a moment and check again."
+explanation: "Logs from your cluster are in Grail — captured with no restart, no injection and no application change."
 -->
 
 <!-- LAB_SOLUTION
