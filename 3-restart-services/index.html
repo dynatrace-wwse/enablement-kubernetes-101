@@ -703,13 +703,13 @@ explanation: "A todo was created — its log line and its trace should reach Gra
 
 <h2 id="verify-the-log">Verify the log<a class="headerlink" href="#verify-the-log" title="Permanent link">#</a></h2>
 <p>The app logs each todo it accepts, with the title you typed:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>com.dynatrace.todoapp.TodoController : Adding a new todo: TodoRecord{title=&#39;...&#39;}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>com.dynatrace.todoapp.TodoController : Adding a new todo: TodoRecord{title='...'}
 </span></code></pre></div>
 <p>The <code>endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")</code> filter scopes the query to <strong>your</strong> cluster — every session gets a unique cluster identity ending in your session id, so classmates running this training against the same tenant never pollute your results.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>fetch logs, from:now()-15m
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>| filter endsWith(k8s.cluster.name, &quot;{{DT_SESSION_ID}}&quot;)
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>| filter k8s.namespace.name == &quot;todoapp&quot;
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>| filter contains(content, &quot;Adding a new todo&quot;)
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>| filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>| filter k8s.namespace.name == "todoapp"
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>| filter contains(content, "Adding a new todo")
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>| fields timestamp, content
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>| limit 5
 </span></code></pre></div>
@@ -733,8 +733,8 @@ explanation: "Your todo's log line is in Grail — captured by the log module, w
 <p>This is the signal that did <strong>not</strong> exist before the restart. Adding a todo sends a <code>POST /todos</code> request, and the injected OneAgent now records it as a distributed trace — a root span named <code>POST /todos</code>, resolved to the <code>addTodo</code> endpoint of the application.</p>
 <p>Notice that the span carries the same Kubernetes context as the log (<code>k8s.cluster.name</code>, <code>k8s.namespace.name</code>, <code>k8s.workload.name</code>). That is metadata enrichment: Dynatrace stitches cluster identity onto the telemetry, which is exactly what lets you scope this query to your own cluster.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>fetch spans, from:now()-15m
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>| filter endsWith(k8s.cluster.name, &quot;{{DT_SESSION_ID}}&quot;)
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>| filter k8s.namespace.name == &quot;todoapp&quot;
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>| filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>| filter k8s.namespace.name == "todoapp"
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>| fields start_time, span.name, endpoint.name, duration, k8s.workload.name
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>| limit 5
 </span></code></pre></div>

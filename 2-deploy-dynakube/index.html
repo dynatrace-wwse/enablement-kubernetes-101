@@ -820,7 +820,7 @@ explanation: "The log module is Running — every container's stdout on this nod
 <p>The <code>endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")</code> filter scopes the query to <strong>your</strong> cluster. Every session gets a unique cluster identity ending in your session id, so classmates running this training against the same tenant never pollute your results.</p>
 <p>The query below counts the log lines collected from your cluster in the last 30 minutes, grouped by namespace and log level. The result is a small table that proves something bigger than "logs arrive": <strong>every namespace on the cluster is shipping logs</strong> — the demo app, the Dynatrace components, the system namespaces — all without touching a single one of them.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>fetch logs, from:now()-30m
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>| filter endsWith(k8s.cluster.name, &quot;{{DT_SESSION_ID}}&quot;)
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>| filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>| summarize count = count(), by: {namespace = k8s.namespace.name, level = loglevel}
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>| sort namespace asc, count desc
 </span></code></pre></div>
