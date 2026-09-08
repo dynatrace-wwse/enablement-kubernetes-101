@@ -4,7 +4,6 @@
 
 <!-- STEP_SETUP
 commands:
-  - patchCsiCodeModulesLinks
   - dynatraceEvalReadSaveCredentials && generateDynakube
 -->
 
@@ -172,7 +171,6 @@ reveal: |
   DynaKube in one step — the "Run solution" button runs it and confirms the DynaKube CR exists.
 commands:
   - deployApplicationMonitoring
-  - patchCsiCodeModulesLinks
 verify:
   - kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | grep -q .
 -->
