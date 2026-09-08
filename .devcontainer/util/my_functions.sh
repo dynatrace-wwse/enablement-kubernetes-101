@@ -167,3 +167,90 @@ generateTodoTraffic() {
   printError "Failed to create the TODO. Response: $resp"
   return 1
 }
+
+# ─── Temporary: sprint codemodules images are not pullable ────────────────────
+#
+# On sprint tenants the DynaKube resolves its codemodules image from the TENANT'S
+# PRIVATE registry (478983378254.dkr.ecr.us-east-1.amazonaws.com). No paasToken is
+# issued for these sessions and no <dynakube>-pull-secret is created, so the CSI
+# provisioner's pull goes out unauthenticated and answers:
+#
+#   401 Unauthorized: Not Authorized
+#
+# NOTHING is extracted -- /data/codemodules stays completely empty, with no version
+# directory at all. installAgentFromImage() swallows the pull failure and returns
+# nil, so the only error ever raised is the downstream
+#
+#   open /data/codemodules/<version>/agent/bin: no such file or directory
+#
+# from symlink.findVersionFromFileSystem. The provisioner never records the version
+# and digest, every oneagent-bin mount is refused from then on, and the learner's
+# pod sits in Init forever.
+#
+# This is NOT the operator 1.10.x link-entry extraction issue: that would leave a
+# version directory holding partial contents. There is no archive here because the
+# image was never fetched. An earlier workaround setting
+# DT_EXTRACT_CODEMODULES_IMAGE_LINKS=true was reverted -- it changes how an archive
+# is unpacked and cannot help when the pull itself is refused.
+#
+# Fix: pin spec.oneAgent.applicationMonitoring.codeModulesImage to the newest PUBLIC
+# build, which pulls anonymously. The framework's fixSprintActiveGateImage already
+# does exactly this for the ActiveGate image, for exactly this reason.
+#
+# Delete this once sprint sessions get a working pull secret -- the tenant's own,
+# newer codemodules image is preferable when it can actually be pulled.
+latestPublicCodeModulesImage() {
+  # Echo the newest pullable ref on public.ecr.aws/dynatrace/dynatrace-codemodules,
+  # or return non-zero if it cannot be resolved (offline / API change).
+  #
+  # Only PLAIN N.N.N.N-N tags. The repository also publishes single-language
+  # variants (-java, -python, -nodejs, -php) which sort adjacent to the multi-arch
+  # tag and must never be selected -- picking one would instrument only that runtime.
+  local repo="public.ecr.aws/dynatrace/dynatrace-codemodules" token tag
+  token="$(curl -fsS https://public.ecr.aws/token/ 2>/dev/null | jq -r '.token // empty')" || return 1
+  [ -n "$token" ] || return 1
+  tag="$(curl -fsS -H "Authorization: Bearer $token" \
+        "https://public.ecr.aws/v2/dynatrace/dynatrace-codemodules/tags/list" 2>/dev/null \
+        | jq -r '.tags[]?' \
+        | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$' | sort -V | tail -1)"
+  [ -n "$tag" ] || return 1
+  echo "${repo}:${tag}"
+}
+
+fixSprintCodeModulesImage() {
+  # Post-apply patch: needs a DynaKube to already exist, so it runs AFTER the
+  # deploy (unlike the reverted workaround, which patched workloads beforehand).
+  # Best-effort throughout -- never fails the lab step it is called from.
+  isSprintTenant || return 0
+
+  local dk
+  dk="$(kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | awk '{print $1}' | head -1)"
+  if [ -z "$dk" ]; then
+    printWarn "No DynaKube found — nothing to pin"
+    return 0
+  fi
+
+  # Already pinned? Skip, and keep the log honest about what happened.
+  local current
+  current="$(kubectl -n dynatrace get dynakube "$dk" \
+    -o jsonpath='{.spec.oneAgent.applicationMonitoring.codeModulesImage}' 2>/dev/null)"
+  case "$current" in
+    public.ecr.aws/*)
+      printInfo "codeModulesImage already pinned to $current — nothing to do"
+      return 0
+      ;;
+  esac
+
+  local img
+  if ! img="$(latestPublicCodeModulesImage)"; then
+    printWarn "Could not resolve a public codemodules image — leaving the default."
+    return 0
+  fi
+
+  printWarn "Sprint codemodules images are not pullable (401 from the tenant's private registry) — pinning the latest public build."
+  printInfo "Pinning codeModulesImage to $img"
+  kubectl -n dynatrace patch dynakube "$dk" --type=merge \
+    -p "{\"spec\":{\"oneAgent\":{\"applicationMonitoring\":{\"codeModulesImage\":\"$img\"}}}}" >/dev/null 2>&1 \
+    || printWarn "Could not patch the DynaKube (continuing)"
+  return 0
+}
