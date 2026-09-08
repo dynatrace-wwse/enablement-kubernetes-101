@@ -92,6 +92,7 @@ reveal: |
   button executes for you and then confirms the operator pod is `Running`.
 commands:
   - dynatraceDeployOperator
+  - patchCsiCodeModulesLinks
 verify:
   - kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -q Running
 -->
