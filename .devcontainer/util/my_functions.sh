@@ -168,88 +168,89 @@ generateTodoTraffic() {
   return 1
 }
 
-# ======================================================================
-#   TEMPORARY PATCH — Dynatrace Operator 1.10.x codemodules extraction
-# ----------------------------------------------------------------------
-#   THIS TRAINING ONLY, AND MEANT TO BE DELETED.
-#   Remove once the operator extracts codemodules archives correctly
-#   without an opt-in. Dynatrace's own 1.10.0 release notes say the
-#   `extractCodeModulesImageLinks` Helm value "will be removed in a
-#   future release" — when it goes, this function goes with it.
+# ─── Temporary: sprint codemodules images are not pullable ────────────────────
 #
-#   Symptom (hit on k8s-101 self-service, and previously at Bootcamp):
-#   the app pod never leaves Init, forever, with
+# On sprint tenants the DynaKube resolves its codemodules image from the TENANT'S
+# PRIVATE registry (478983378254.dkr.ecr.us-east-1.amazonaws.com). No paasToken is
+# issued for these sessions and no <dynakube>-pull-secret is created, so the CSI
+# provisioner's pull goes out unauthenticated and answers:
 #
-#     MountVolume.SetUp failed for volume "oneagent-bin" : rpc error:
-#     code = Unavailable desc = version or digest is not yet set,
-#     csi-provisioner hasn't finished setup yet for <dynakube>
+#   401 Unauthorized: Not Authorized
 #
-#   and, in the csi-provisioner container,
+# NOTHING is extracted -- /data/codemodules stays completely empty, with no version
+# directory at all. installAgentFromImage() swallows the pull failure and returns
+# nil, so the only error ever raised is the downstream
 #
-#     open /data/codemodules/<version>/agent/bin: no such file or directory
-#       ...installer/symlink.findVersionFromFileSystem
+#   open /data/codemodules/<version>/agent/bin: no such file or directory
 #
-#   Cause: operator 1.10.0 changed codemodules extraction to handle
-#   regular files only and skip link entries. `agent/bin` is built from
-#   those link entries, so it is never created. findVersionFromFileSystem
-#   then fails, the provisioner never records the version+digest for the
-#   DynaKube, and the node server refuses every oneagent-bin mount.
+# from symlink.findVersionFromFileSystem. The provisioner never records the version
+# and digest, every oneagent-bin mount is refused from then on, and the learner's
+# pod sits in Init forever.
 #
-#   Note how it gets there: installAgentFromImage() logs
-#   "failed to extract agent binaries from image via proxy" and returns
-#   nil. The extraction failure is swallowed — only the downstream
-#   symlink crash is ever raised. Nothing in the pod events, the DynaKube
-#   status or the operator log says "extraction was incomplete".
+# This is NOT the operator 1.10.x link-entry extraction issue: that would leave a
+# version directory holding partial contents. There is no archive here because the
+# image was never fetched. An earlier workaround setting
+# DT_EXTRACT_CODEMODULES_IMAGE_LINKS=true was reverted -- it changes how an archive
+# is unpacked and cannot help when the pull itself is refused.
 #
-#   The fix is the `extractCodeModulesImageLinks=true` Helm value. It
-#   renders to the env var set below, on exactly two workloads — verified
-#   by diffing `helm template` with the value on and off against chart
-#   1.10.2, not assumed. Patching the objects directly rather than running
-#   `helm upgrade` keeps this working however the operator was installed:
-#   the lab's `helm install dynatrace/dynatrace-operator`, the framework's
-#   OCI chart, or a learner's own variation.
+# Fix: pin spec.oneAgent.applicationMonitoring.codeModulesImage to the newest PUBLIC
+# build, which pulls anonymously. The framework's fixSprintActiveGateImage already
+# does exactly this for the ActiveGate image, for exactly this reason.
 #
-#   Safe to call always: no-op if the operator is not installed yet,
-#   idempotent on repeat calls, and inert on operators older than 1.10.0
-#   (the env var is simply unknown to those builds). Never fails the step
-#   it is called from — it returns 0 even when it cannot patch.
-# ======================================================================
-patchCsiCodeModulesLinks() {
-  local envvar="DT_EXTRACT_CODEMODULES_IMAGE_LINKS=true"
-  printInfoSection "Applying the temporary Dynatrace Operator CSI codemodules patch"
+# Delete this once sprint sessions get a working pull secret -- the tenant's own,
+# newer codemodules image is preferable when it can actually be pulled.
+latestPublicCodeModulesImage() {
+  # Echo the newest pullable ref on public.ecr.aws/dynatrace/dynatrace-codemodules,
+  # or return non-zero if it cannot be resolved (offline / API change).
+  #
+  # Only PLAIN N.N.N.N-N tags. The repository also publishes single-language
+  # variants (-java, -python, -nodejs, -php) which sort adjacent to the multi-arch
+  # tag and must never be selected -- picking one would instrument only that runtime.
+  local repo="public.ecr.aws/dynatrace/dynatrace-codemodules" token tag
+  token="$(curl -fsS https://public.ecr.aws/token/ 2>/dev/null | jq -r '.token // empty')" || return 1
+  [ -n "$token" ] || return 1
+  tag="$(curl -fsS -H "Authorization: Bearer $token" \
+        "https://public.ecr.aws/v2/dynatrace/dynatrace-codemodules/tags/list" 2>/dev/null \
+        | jq -r '.tags[]?' \
+        | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$' | sort -V | tail -1)"
+  [ -n "$tag" ] || return 1
+  echo "${repo}:${tag}"
+}
 
-  if ! kubectl get namespace dynatrace &>/dev/null; then
-    printWarn "No dynatrace namespace yet — operator not installed, skipping the CSI patch"
+fixSprintCodeModulesImage() {
+  # Post-apply patch: needs a DynaKube to already exist, so it runs AFTER the
+  # deploy (unlike the reverted workaround, which patched workloads beforehand).
+  # Best-effort throughout -- never fails the lab step it is called from.
+  isSprintTenant || return 0
+
+  local dk
+  dk="$(kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | awk '{print $1}' | head -1)"
+  if [ -z "$dk" ]; then
+    printWarn "No DynaKube found — nothing to pin"
     return 0
   fi
 
-  if ! kubectl -n dynatrace get daemonset dynatrace-oneagent-csi-driver &>/dev/null; then
-    printWarn "CSI driver DaemonSet not found — nothing to patch (CSI may be disabled)"
+  # Already pinned? Skip, and keep the log honest about what happened.
+  local current
+  current="$(kubectl -n dynatrace get dynakube "$dk" \
+    -o jsonpath='{.spec.oneAgent.applicationMonitoring.codeModulesImage}' 2>/dev/null)"
+  case "$current" in
+    public.ecr.aws/*)
+      printInfo "codeModulesImage already pinned to $current — nothing to do"
+      return 0
+      ;;
+  esac
+
+  local img
+  if ! img="$(latestPublicCodeModulesImage)"; then
+    printWarn "Could not resolve a public codemodules image — leaving the default."
     return 0
   fi
 
-  # Already patched? Then leave the workloads alone — re-setting would be a
-  # no-op on the spec, but skipping keeps the log honest about what happened.
-  if kubectl -n dynatrace get daemonset dynatrace-oneagent-csi-driver \
-       -o jsonpath='{.spec.template.spec.containers[?(@.name=="provisioner")].env[*].name}' 2>/dev/null \
-       | tr ' ' '\n' | grep -qx "DT_EXTRACT_CODEMODULES_IMAGE_LINKS"; then
-    printInfo "CSI codemodules patch already applied — nothing to do"
-    return 0
-  fi
-
-  printInfo "Setting $envvar on the csi-driver provisioner and the webhook"
-  kubectl -n dynatrace set env daemonset/dynatrace-oneagent-csi-driver -c provisioner "$envvar" \
-    || { printWarn "Could not patch the CSI driver DaemonSet"; return 0; }
-  # The webhook carries the same flag in the chart. Patch it too so the two
-  # halves of the injection path never disagree about the archive layout.
-  kubectl -n dynatrace set env deployment/dynatrace-webhook -c webhook "$envvar" \
-    || printWarn "Could not patch the webhook Deployment (continuing)"
-
-  # `kubectl set env` rolls the workloads. Wait, so the next step does not
-  # apply a DynaKube against a provisioner that is still restarting.
-  kubectl -n dynatrace rollout status daemonset/dynatrace-oneagent-csi-driver --timeout=120s \
-    || printWarn "CSI driver did not report ready within 120s — inspect: kubectl get pods -n dynatrace"
-
-  printInfo "CSI codemodules patch applied — the provisioner can now build agent/bin"
+  printWarn "Sprint codemodules images are not pullable (401 from the tenant's private registry) — pinning the latest public build."
+  printInfo "Pinning codeModulesImage to $img"
+  kubectl -n dynatrace patch dynakube "$dk" --type=merge \
+    -p "{\"spec\":{\"oneAgent\":{\"applicationMonitoring\":{\"codeModulesImage\":\"$img\"}}}}" >/dev/null 2>&1 \
+    || printWarn "Could not patch the DynaKube (continuing)"
   return 0
 }
