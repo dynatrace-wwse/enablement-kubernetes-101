@@ -167,3 +167,89 @@ generateTodoTraffic() {
   printError "Failed to create the TODO. Response: $resp"
   return 1
 }
+
+# ======================================================================
+#   TEMPORARY PATCH — Dynatrace Operator 1.10.x codemodules extraction
+# ----------------------------------------------------------------------
+#   THIS TRAINING ONLY, AND MEANT TO BE DELETED.
+#   Remove once the operator extracts codemodules archives correctly
+#   without an opt-in. Dynatrace's own 1.10.0 release notes say the
+#   `extractCodeModulesImageLinks` Helm value "will be removed in a
+#   future release" — when it goes, this function goes with it.
+#
+#   Symptom (hit on k8s-101 self-service, and previously at Bootcamp):
+#   the app pod never leaves Init, forever, with
+#
+#     MountVolume.SetUp failed for volume "oneagent-bin" : rpc error:
+#     code = Unavailable desc = version or digest is not yet set,
+#     csi-provisioner hasn't finished setup yet for <dynakube>
+#
+#   and, in the csi-provisioner container,
+#
+#     open /data/codemodules/<version>/agent/bin: no such file or directory
+#       ...installer/symlink.findVersionFromFileSystem
+#
+#   Cause: operator 1.10.0 changed codemodules extraction to handle
+#   regular files only and skip link entries. `agent/bin` is built from
+#   those link entries, so it is never created. findVersionFromFileSystem
+#   then fails, the provisioner never records the version+digest for the
+#   DynaKube, and the node server refuses every oneagent-bin mount.
+#
+#   Note how it gets there: installAgentFromImage() logs
+#   "failed to extract agent binaries from image via proxy" and returns
+#   nil. The extraction failure is swallowed — only the downstream
+#   symlink crash is ever raised. Nothing in the pod events, the DynaKube
+#   status or the operator log says "extraction was incomplete".
+#
+#   The fix is the `extractCodeModulesImageLinks=true` Helm value. It
+#   renders to the env var set below, on exactly two workloads — verified
+#   by diffing `helm template` with the value on and off against chart
+#   1.10.2, not assumed. Patching the objects directly rather than running
+#   `helm upgrade` keeps this working however the operator was installed:
+#   the lab's `helm install dynatrace/dynatrace-operator`, the framework's
+#   OCI chart, or a learner's own variation.
+#
+#   Safe to call always: no-op if the operator is not installed yet,
+#   idempotent on repeat calls, and inert on operators older than 1.10.0
+#   (the env var is simply unknown to those builds). Never fails the step
+#   it is called from — it returns 0 even when it cannot patch.
+# ======================================================================
+patchCsiCodeModulesLinks() {
+  local envvar="DT_EXTRACT_CODEMODULES_IMAGE_LINKS=true"
+  printInfoSection "Applying the temporary Dynatrace Operator CSI codemodules patch"
+
+  if ! kubectl get namespace dynatrace &>/dev/null; then
+    printWarn "No dynatrace namespace yet — operator not installed, skipping the CSI patch"
+    return 0
+  fi
+
+  if ! kubectl -n dynatrace get daemonset dynatrace-oneagent-csi-driver &>/dev/null; then
+    printWarn "CSI driver DaemonSet not found — nothing to patch (CSI may be disabled)"
+    return 0
+  fi
+
+  # Already patched? Then leave the workloads alone — re-setting would be a
+  # no-op on the spec, but skipping keeps the log honest about what happened.
+  if kubectl -n dynatrace get daemonset dynatrace-oneagent-csi-driver \
+       -o jsonpath='{.spec.template.spec.containers[?(@.name=="provisioner")].env[*].name}' 2>/dev/null \
+       | tr ' ' '\n' | grep -qx "DT_EXTRACT_CODEMODULES_IMAGE_LINKS"; then
+    printInfo "CSI codemodules patch already applied — nothing to do"
+    return 0
+  fi
+
+  printInfo "Setting $envvar on the csi-driver provisioner and the webhook"
+  kubectl -n dynatrace set env daemonset/dynatrace-oneagent-csi-driver -c provisioner "$envvar" \
+    || { printWarn "Could not patch the CSI driver DaemonSet"; return 0; }
+  # The webhook carries the same flag in the chart. Patch it too so the two
+  # halves of the injection path never disagree about the archive layout.
+  kubectl -n dynatrace set env deployment/dynatrace-webhook -c webhook "$envvar" \
+    || printWarn "Could not patch the webhook Deployment (continuing)"
+
+  # `kubectl set env` rolls the workloads. Wait, so the next step does not
+  # apply a DynaKube against a provisioner that is still restarting.
+  kubectl -n dynatrace rollout status daemonset/dynatrace-oneagent-csi-driver --timeout=120s \
+    || printWarn "CSI driver did not report ready within 120s — inspect: kubectl get pods -n dynatrace"
+
+  printInfo "CSI codemodules patch applied — the provisioner can now build agent/bin"
+  return 0
+}
