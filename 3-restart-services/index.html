@@ -749,6 +749,8 @@ dql: |
   | limit 1
 expect:
   operator: not-empty
+pollSeconds: 5
+timeoutSeconds: 120
 hint: "Traces only exist for pods restarted AFTER the DynaKube was applied — confirm the injection check above passed, then add another todo and wait ~1–2 minutes."
 explanation: "The trace is in Grail — the request was recorded from inside the application process, which is what the restart made possible."
 -->
