@@ -1,0 +1,70 @@
+# Dynatrace API token declaration for enablement-kubernetes-101.
+#
+# This repo previously had NO file here and inherited the framework default
+# (codespaces-framework/.devcontainer/yaml/dt-tokens.yaml). The token set below is
+# deliberately identical to that default — this file exists to carry the migration
+# status, which is a per-repo fact and must not be asserted for all 27 repos at once
+# by editing the framework file.
+#
+# ⚠️ THE TOKEN LIST MUST STAY HERE. Do not remove it to reduce duplication.
+#
+# Orbital's `load_token_contract` (token_specs.py) walks three rungs in order:
+#   1. This repo's dt-tokens.yaml (GitHub raw)
+#   2. codespaces-framework/dt-tokens.yaml (GitHub raw, the "framework rung")
+#   3. Hardcoded DEFAULT_SPECS (offline fallback, Python constants only)
+#
+# `_parse_yaml` reads `data.get("tokens", []) or DEFAULT_SPECS`, so a file with
+# `migrationStatus:` but no `tokens:` block parses, returns DEFAULT_SPECS, and the
+# function returns from rung 1 — the framework URL is never fetched. Trimming the
+# list severs the framework rung silently: k8s-101 would resolve specs from Python
+# constants, not from the framework YAML, and a future scope change in 1.12.0 would
+# not reach it even though source_framework.sh says 1.11.0. The _parse_yaml docstring
+# (:316-322) names exactly this failure mode.
+#
+# The right fix (fall through to rung 2 for specs when only migrationStatus is
+# declared) requires a change to token_specs.py and is not part of this PR.
+
+# PROVEN to run where classic API-token creation is retired: on such a tenant the app
+# falls back to platform minting and translates these classic scopes through
+# CLASSIC_TO_PLATFORM (api/_platform-mint.ts, mirrored in provisioning/token_specs.py).
+# Two scopes do not survive that translation and are dropped there by design —
+# `DataExport` and `openTelemetryTrace.ingest`, both mapped to None as "covered
+# elsewhere / not needed for applicationMonitoring". `migration_gaps()` reports them
+# rather than leaving the claim and the drop invisible to each other.
+migrationStatus: migrated
+
+# ⚠️ `kind:` is deliberately NOT pinned to `platform`, and that is a departure from the
+# phase document, which asked for both specs pinned.
+#
+# `migrationStatus` and `kind` answer different questions. `migrationStatus` says this
+# training works on a classic-retired tenant. `kind` says which API mints it. Pinning
+# `platform` would take the classic path away on tenants where classic STILL WORKS, and
+# classic tokens are self-contained: no `scopes ∩ owner IAM policy` intersection, no
+# per-owner cap. That intersection is finding #2 — a 201 from the mint API, a token that
+# cannot do the job, and no error anywhere. Pinning would trade finding #1's loud 412
+# for finding #2's silent stall on every tenant that had neither problem.
+#
+# So: classic first where classic exists, platform fallback where it does not, and a
+# status that says the fallback has been exercised. `mintTrainingTokens.function.ts`
+# already routes exactly this way, per environment, cached by HTTP status.
+tokens:
+  - name_suffix: operator
+    env_var: DT_OPERATOR_TOKEN
+    scopes:
+      # .create is what the operator needs to ISSUE the ActiveGate its token —
+      # without it the AG pod never reaches Running (found by training-test).
+      - activeGateTokenManagement.create
+      - activeGateTokenManagement.write
+      - entities.read
+      - settings.read
+      - settings.write
+      - DataExport
+      - InstallerDownload
+
+  - name_suffix: ingest
+    env_var: DT_INGEST_TOKEN
+    scopes:
+      - metrics.ingest
+      - logs.ingest
+      - events.ingest
+      - openTelemetryTrace.ingest
