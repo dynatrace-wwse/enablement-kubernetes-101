@@ -25,12 +25,23 @@
 # declared) requires a change to token_specs.py and is not part of this PR.
 
 # PROVEN to run where classic API-token creation is retired: on such a tenant the app
-# falls back to platform minting and translates these classic scopes through
-# CLASSIC_TO_PLATFORM (api/_platform-mint.ts, mirrored in provisioning/token_specs.py).
-# Two scopes do not survive that translation and are dropped there by design —
-# `DataExport` and `openTelemetryTrace.ingest`, both mapped to None as "covered
-# elsewhere / not needed for applicationMonitoring". `migration_gaps()` reports them
-# rather than leaving the claim and the drop invisible to each other.
+# falls back to platform minting, and BOTH generations are now declared here — the
+# classic set under `scopes:` and the platform set under `platform_scopes:`.
+#
+# Until this change the platform generation was INFERRED, by translating the classic
+# list through CLASSIC_TO_PLATFORM (api/_platform-mint.ts, mirrored in
+# provisioning/token_specs.py). That translation is a compatibility path, not an
+# answer: for the ingest token it emits six scopes where Dynatrace's own Kubernetes
+# UI issues four, and `openpipeline:*:ingest` is a family no classic scope names, so
+# it cannot be derived at all — only declared. `platform_scopes_for()` in
+# token_specs.py reads a declared set in preference to translating.
+#
+# Declared beats derived does not mean the two agree. Classic capabilities with no
+# counterpart in the declared platform set are reported by `migration_gaps()` —
+# `DataExport` (classic-only API the Operator never calls), `entities.read` and
+# `events.ingest` — rather than leaving the claim and the drop invisible to each
+# other. All three are absent from the sets the product itself issues, and the
+# end-to-end runs below came up without them.
 migrationStatus: migrated
 
 # ⚠️ `kind:` is deliberately NOT pinned to `platform`, and that is a departure from the
@@ -60,6 +71,28 @@ tokens:
       - settings.write
       - DataExport
       - InstallerDownload
+    # PLATFORM generation (dt0s16), declared rather than translated.
+    #
+    # This is the set Dynatrace's own Kubernetes deployment UI issues for deploying the
+    # Operator and its components, verified by running kubernetes-101 end to end against
+    # two real tenants — one classic, one classic-retired. Both came up: DynaKube
+    # reconciled, ActiveGate connected with a tenant-issued cluster MEID, OneAgent
+    # injected, tenant accepted ingest, zero Operator errors.
+    #
+    # Declaring it NARROWS what this training used to receive. Translating the classic
+    # list above emits these seven PLUS `fleet-management:activegate.tokens:write` and
+    # `storage:entities:read` — a strict superset. Orbital deliberately does not narrow
+    # that superset in its own fallback specs, because nothing in that repository knows
+    # this training ran without the two extras. This file does know: that run is what
+    # this list was read off. Hence the narrowing belongs here and nowhere else.
+    platform_scopes:
+      - fleet-management:activegate.connection-info:read
+      - fleet-management:activegate.tokens:create
+      - fleet-management:container-images:read
+      - fleet-management:oneagent.connection-info:read
+      - fleet-management:oneagents:download
+      - settings:objects:read
+      - settings:objects:write
 
   - name_suffix: ingest
     env_var: DT_INGEST_TOKEN
@@ -68,3 +101,18 @@ tokens:
       - logs.ingest
       - events.ingest
       - openTelemetryTrace.ingest
+    # PLATFORM generation (dt0s16) — the set the product issues for the data-ingest
+    # token, same provenance and same end-to-end proof as the operator set above.
+    #
+    # This one CANNOT be derived: `openpipeline:*:ingest` is a scope family no classic
+    # scope names. Translation emits `storage:{metrics,logs,events}:write` plus the
+    # openpipeline scopes — six, against the four the product issues.
+    #
+    # No event-ingest scope appears here while the classic contract above asks for
+    # `events.ingest`. That is the proven set left as the proven set rather than padded
+    # with a guess; `migration_gaps()` reports the difference instead of hiding it.
+    platform_scopes:
+      - openpipeline:logs:ingest
+      - openpipeline:metrics:ingest
+      - openpipeline:traces:ingest
+      - storage:metrics:write
