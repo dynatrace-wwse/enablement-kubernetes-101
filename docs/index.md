@@ -7,7 +7,7 @@ tags:
 difficulty: beginner
 duration: 90
 ---
-
+  
 # Kubernetes 101 — Dynatrace Application Observability
 
 !!! success "Fully migrated to the Dynatrace Enablement App"
