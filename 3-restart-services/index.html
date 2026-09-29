@@ -682,7 +682,7 @@ buttonText: "Check Injection"
 command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkOneAgentInjected"
 expect:
   operator: exit-zero
-hint: "Run `kubectl rollout restart deployment -n todoapp` in the Terminal tab and wait for the rollout to finish, then check again — it looks for the `oneagent.dynatrace.com/injected: true` annotation on the restarted pods."
+hint: "Run `kubectl rollout restart deployment -n todoapp` in your terminal (in the Dynatrace app: Workspace tab → Open terminal) and wait for the rollout to finish, then check again — it looks for the `oneagent.dynatrace.com/injected: true` annotation on the restarted pods."
 explanation: "OneAgent injected — the todoapp pods have the `oneagent.dynatrace.com/injected: true` annotation confirming agent injection at startup."
 -->
 
