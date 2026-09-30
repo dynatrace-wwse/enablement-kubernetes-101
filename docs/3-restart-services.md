@@ -80,7 +80,7 @@ com.dynatrace.todoapp.TodoController : Adding a new todo: TodoRecord{title='...'
 The `endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")` filter scopes the query to **your** cluster — every session gets a unique cluster identity ending in your session id, so classmates running this training against the same tenant never pollute your results.
 
 ```dql
-fetch logs, from:now()-15m
+fetch logs, from:now()-2h
 | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
 | filter k8s.namespace.name == "todoapp"
 | filter contains(content, "Adding a new todo")
@@ -93,7 +93,7 @@ type: dql-verification
 question: "Verify the log line for your todo reached Dynatrace Grail"
 buttonText: "Check logs in Grail"
 dql: |
-  fetch logs, from:now()-15m
+  fetch logs, from:now()-2h
   | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
   | filter k8s.namespace.name == "todoapp"
   | filter contains(content, "Adding a new todo")
