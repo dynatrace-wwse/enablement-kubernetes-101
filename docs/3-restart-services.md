@@ -80,7 +80,7 @@ com.dynatrace.todoapp.TodoController : Adding a new todo: TodoRecord{title='...'
 The `endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")` filter scopes the query to **your** cluster — every session gets a unique cluster identity ending in your session id, so classmates running this training against the same tenant never pollute your results.
 
 ```dql
-fetch logs, from:now()-15m
+fetch logs, from:now()-2h
 | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
 | filter k8s.namespace.name == "todoapp"
 | filter contains(content, "Adding a new todo")
@@ -93,7 +93,7 @@ type: dql-verification
 question: "Verify the log line for your todo reached Dynatrace Grail"
 buttonText: "Check logs in Grail"
 dql: |
-  fetch logs, from:now()-15m
+  fetch logs, from:now()-2h
   | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
   | filter k8s.namespace.name == "todoapp"
   | filter contains(content, "Adding a new todo")
@@ -111,7 +111,7 @@ This is the signal that did **not** exist before the restart. Adding a todo send
 Notice that the span carries the same Kubernetes context as the log (`k8s.cluster.name`, `k8s.namespace.name`, `k8s.workload.name`). That is metadata enrichment: Dynatrace stitches cluster identity onto the telemetry, which is exactly what lets you scope this query to your own cluster.
 
 ```dql
-fetch spans, from:now()-15m
+fetch spans, from:now()-2h
 | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
 | filter k8s.namespace.name == "todoapp"
 | fields start_time, span.name, endpoint.name, duration, k8s.workload.name
@@ -123,7 +123,7 @@ type: dql-verification
 question: "Verify the trace for your todo request reached Dynatrace Grail"
 buttonText: "Check traces in Grail"
 dql: |
-  fetch spans, from:now()-15m
+  fetch spans, from:now()-2h
   | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
   | filter k8s.namespace.name == "todoapp"
   | limit 1
