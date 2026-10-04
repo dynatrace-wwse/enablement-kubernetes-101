@@ -1,6 +1,7 @@
 ---
 description: Instrument a live Kubernetes cluster with Dynatrace from scratch — deploy the Operator, configure a DynaKube, and watch logs, traces, and metrics arrive in Grail.
 tags:
+  - interactive
   - kubernetes
   - observability
   - operator
