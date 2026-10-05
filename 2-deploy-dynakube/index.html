@@ -774,7 +774,7 @@ commands:
 type: shell-verification
 question: "Verify the DynaKube custom resource was created"
 buttonText: "Check DynaKube"
-command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkDynakube"
+command: "checkDynakube"
 expect:
   operator: exit-zero
 hint: "Apply the manifests from the Dynatrace UI wizard, then check again — the check looks for the DynaKube CR in the dynatrace namespace."
@@ -786,7 +786,7 @@ explanation: "DynaKube CR is present — the operator will now provision monitor
 type: shell-verification
 question: "Verify the ActiveGate pod is Running in the dynatrace namespace"
 buttonText: "Check ActiveGate"
-command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkActiveGateReady"
+command: "checkActiveGateReady"
 expect:
   operator: exit-zero
 hint: "The ActiveGate pod may take 1–2 minutes to start after the DynaKube is applied. Watch `kubectl get pods -n dynatrace` and check again once it is Running."
@@ -808,7 +808,7 @@ explanation: "ActiveGate is Running — your cluster is connected to the Dynatra
 type: shell-verification
 question: "Verify the Dynatrace log module is running on your cluster"
 buttonText: "Check log module"
-command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkLogModuleReady"
+command: "checkLogModuleReady"
 expect:
   operator: exit-zero
 hint: "The log module DaemonSet is rolled out by the operator a few moments after the DynaKube is applied. Watch `kubectl get pods -n dynatrace` and check again once a `logmonitoring` pod is Running."
