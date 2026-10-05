@@ -136,29 +136,33 @@ waitForLogModuleReady() { LAB_WAIT=1 checkLogModuleReady; }
 # automated path produce the same evidence. A random nonce bought nothing — the
 # DQL never matched it, only the query's time window separated runs.
 #
-# Learner click: single attempt, fail fast if the endpoint isn't up.
-# LAB_WAIT=1 (automation): waits for the endpoint first (ingress + app startup).
+# Always waits for the endpoint first (TODO_TRAFFIC_WAIT seconds, default 60;
+# 150 with LAB_WAIT=1): a finished `kubectl rollout status` only means the
+# container started, and the app answers HTTP some seconds later. Without the
+# wait, Section 3's "restart && rollout status && generateTodoTraffic" solution
+# raced the rollout and failed although every check passed by hand (ENH-063 F-3).
+# Same logic as the framework's generateTodoTraffic (1.12.0+).
 generateTodoTraffic() {
-  local title="Kubernetes 101"
+  local title="${1:-Kubernetes 101}"
   local url="http://localhost:${K3D_LB_HTTP_PORT:-80}"
   local host="todoapp.$(detectHostname)"
+  local wait_s="${TODO_TRAFFIC_WAIT:-60}"
+  [ -n "${LAB_WAIT:-}" ] && [ -z "${TODO_TRAFFIC_WAIT:-}" ] && wait_s=150
+  local step=5 waited=0
   printInfoSection "Creating a TODO so logs and traces reach Grail"
   printInfo "title: $title  | endpoint: $url (Host: $host)"
 
-  if [ -n "${LAB_WAIT:-}" ]; then
-    local i=0
-    while [ "$i" -lt 30 ]; do
-      curl -sf -o /dev/null -H "Host: $host" "$url/todos" && break
-      i=$((i + 1)); printInfo "app endpoint not ready ($i/30), waiting 5s"; sleep 5
-    done
-  fi
-  if ! curl -sf -o /dev/null -H "Host: $host" "$url/todos"; then
-    printError "todoapp HTTP endpoint not reachable yet — make sure the app is running, then try again"
-    return 1
-  fi
+  until curl -sf -o /dev/null --max-time 5 -H "Host: $host" "$url/todos"; do
+    if [ "$waited" -ge "$wait_s" ]; then
+      printError "todoapp HTTP endpoint did not answer within ${wait_s}s — make sure the app is running (checkTodoAppRunning), then try again"
+      return 1
+    fi
+    printInfo "app endpoint not answering yet (${waited}s/${wait_s}s), waiting ${step}s"
+    sleep "$step"; waited=$((waited + step))
+  done
 
   local resp
-  resp=$(curl -s -H "Host: $host" -X POST "$url/todos" -H "Content-Type: application/json" \
+  resp=$(curl -s --max-time 10 -H "Host: $host" -X POST "$url/todos" -H "Content-Type: application/json" \
     -d "{\"title\":\"$title\",\"completed\":false}")
   if echo "$resp" | grep -q '"status":"ok"'; then
     printInfo "Created TODO \"$title\" — its log and its POST /todos trace should appear in Grail within ~2 min"
