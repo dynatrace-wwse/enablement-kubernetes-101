@@ -16,8 +16,8 @@ customFunction(){
 # ======================================================================
 #   Step-by-step verification helpers
 # ----------------------------------------------------------------------
-#   Called from the lab pages' `shell-verification` blocks (source the
-#   framework first, then call the function).
+#   Called from the lab pages' `shell-verification` blocks by name alone
+#   (the platform sources the framework before every check).
 #
 #   Learner clicks answer INSTANTLY: one probe, immediate pass/fail with
 #   a clear message — never a spinner while the check retries.
