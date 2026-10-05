@@ -65,7 +65,7 @@ The check below runs `kubectl get pods -n dynatrace` and counts pods in `Running
 type: shell-verification
 question: "Verify the Dynatrace Operator is running in the dynatrace namespace"
 buttonText: "Check Operator"
-command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkOperatorReady"
+command: "checkOperatorReady"
 expect:
   operator: exit-zero
 hint: "Run the three Helm commands above in your terminal (in the Dynatrace app: Workspace tab → Open terminal), wait for the operator pod to reach Running (`kubectl get pods -n dynatrace`), then check again."

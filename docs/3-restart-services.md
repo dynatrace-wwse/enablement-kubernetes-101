@@ -38,7 +38,7 @@ The check below verifies that the restarted pods have the `oneagent.dynatrace.co
 type: shell-verification
 question: "Verify OneAgent was injected into the todoapp pods"
 buttonText: "Check Injection"
-command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkOneAgentInjected"
+command: "checkOneAgentInjected"
 expect:
   operator: exit-zero
 hint: "Run `kubectl rollout restart deployment -n todoapp` in your terminal (in the Dynatrace app: Workspace tab → Open terminal) and wait for the rollout to finish, then check again — it looks for the `oneagent.dynatrace.com/injected: true` annotation on the restarted pods."
@@ -60,7 +60,7 @@ Go to the workspace, open the Todo app, and add a couple of tasks — the text d
 type: shell-verification
 question: "Confirm the app accepts a new todo"
 buttonText: "Add a todo for me"
-command: "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && generateTodoTraffic"
+command: "generateTodoTraffic"
 expect:
   operator: exit-zero
 hint: "Needs the todoapp reachable via the ingress. If the endpoint is not answering yet, wait a moment and try again."
@@ -148,7 +148,7 @@ reveal: |
 commands:
   - kubectl rollout restart deployment -n todoapp && kubectl rollout status deployment -n todoapp --timeout=120s && generateTodoTraffic
 verify:
-  - "source .devcontainer/util/source_framework.sh >/dev/null 2>&1 && checkOneAgentInjected"
+  - "checkOneAgentInjected"
 -->
 
 ## Explore your services in Dynatrace
