@@ -148,18 +148,21 @@ fetch logs, from:now()-30m
 !!! tip "Why `endsWith` and not `==`"
     Your cluster is named after the training plus your session id, but Kubernetes caps how long that name can be — so the *training* half gets truncated while your session id stays intact at the end. `endsWith` matches the part that is guaranteed to survive.
 
+The check below narrows to the `todoapp` namespace: the point is that *your application's* logs arrive, not that Dynatrace can see its own components.
+
 <!-- LAB_QUESTION
 type: dql-verification
-question: "Verify your cluster's container logs are reaching Dynatrace Grail"
+question: "Verify the todoapp's container logs are reaching Dynatrace Grail"
 buttonText: "Check logs in Grail"
 dql: |
   fetch logs, from:now()-15m
   | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+  | filter k8s.namespace.name == "todoapp"
   | limit 1
 expect:
   operator: not-empty
 hint: "The log module needs to be Running first (previous check), and logs take ~1–2 minutes to reach Grail. Wait a moment and check again."
-explanation: "Logs from your cluster are in Grail — captured with no restart, no injection and no application change."
+explanation: "The todoapp's logs are in Grail — captured with no restart, no injection and no application change."
 -->
 
 <!-- LAB_SOLUTION
