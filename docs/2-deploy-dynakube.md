@@ -138,6 +138,13 @@ The `endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")` filter scopes the query to
 
 The query below counts the log lines collected from your cluster in the last 30 minutes, grouped by namespace and log level. The result is a small table that proves something bigger than "logs arrive": **every namespace on the cluster is shipping logs** — the demo app, the Dynatrace components, the system namespaces — all without touching a single one of them.
 
+```dql { .bar title="Logs by namespace" timeframe="24h" min="0" shape="hexagon" }
+fetch logs
+| filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
+| summarize log_count = count(), by: {namespace = k8s.namespace.name}
+| sort log_count desc
+```
+
 ```dql
 fetch logs, from:now()-30m
 | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
