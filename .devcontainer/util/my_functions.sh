@@ -32,6 +32,11 @@ customFunction(){
 #   lab content and published docs keep working during the transition.
 # ======================================================================
 
+
+checkHerik() {
+ printInfo "Hello Henrik"; return 0
+}
+
 # Cluster node is Ready.
 checkNodeReady() {
   if [ -n "${LAB_WAIT:-}" ]; then
