@@ -34,7 +34,7 @@ customFunction(){
 
 
 checkHerik() {
- printInfo "Hello Henrik"; return 0
+   printInfo "Hello Henrik"; return 0
 }
 
 # Cluster node is Ready.
