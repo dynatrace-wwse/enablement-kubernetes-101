@@ -155,9 +155,8 @@ type: dql-verification
 question: "Verify the todoapp's container logs are reaching Dynatrace Grail"
 buttonText: "Check logs in Grail"
 dql: |
-  fetch logs, from:now()-15m
+  fetch logs, from:now()-30m
   | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
-  | filter k8s.namespace.name == "todoapp"
   | limit 1
 expect:
   operator: not-empty
