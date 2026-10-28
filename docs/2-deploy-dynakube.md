@@ -4,7 +4,7 @@
 
 <!-- STEP_SETUP
 commands:
-  - dynatraceEvalReadSaveCredentials && generateDynakube
+  - dynatraceEvalReadSaveCredentials && generateDynakubeAtomic
 -->
 
 # Section 2 — Deploy the DynaKube
@@ -167,15 +167,16 @@ explanation: "The todoapp's logs are in Grail — captured with no restart, no i
 <!-- LAB_SOLUTION
 reveal: |
   The DynaKube manifest is generated for you from your tenant credentials (the
-  `STEP_SETUP` on this step ran `dynatraceEvalReadSaveCredentials && generateDynakube`).
-  Apply it with `kubectl apply -f .devcontainer/yaml/gen/dynakube.yaml`. The framework
-  helper `deployApplicationMonitoring` generates and applies the AppOnly + log-ingest
-  DynaKube in one step — the "Run solution" button runs it and confirms the DynaKube CR exists.
+  `STEP_SETUP` on this step ran `dynatraceEvalReadSaveCredentials && generateDynakubeAtomic`).
+  Apply it with `kubectl apply -f .devcontainer/yaml/gen/dynakube.yaml`. The helper
+  `deployDynakube` regenerates and applies the AppOnly + log-ingest DynaKube in one step,
+  then waits for the ActiveGate and the log module to be Running — the "Run solution"
+  button runs it and confirms the DynaKube CR exists and the log module is up.
 commands:
-  - deployApplicationMonitoring
-  - fixSprintCodeModulesImage
+  - deployDynakube
 verify:
   - kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | grep -q .
+  - checkLogModuleReady
 -->
 
 ## Explore your cluster in Dynatrace

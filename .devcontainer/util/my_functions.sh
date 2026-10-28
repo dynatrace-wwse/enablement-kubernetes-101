@@ -84,9 +84,22 @@ checkDynakube() {
 }
 waitForDynakube() { LAB_WAIT=1 checkDynakube; }
 
+# LAB_WAIT helper: poll until a pod matching <pattern> in <namespace> is Running.
+# The framework's waitForPod only waits until the pod EXISTS (Pending and
+# ContainerCreating count), so the Running probe right after it still raced the
+# rollout. Returns instead of `exit`ing (waitForPod exits the caller's shell).
+_waitPodRunning() {
+  local ns="$1" pattern="$2" tries="${3:-36}" i=0
+  while [ "$i" -lt "$tries" ]; do
+    kubectl get pods -n "$ns" --no-headers 2>/dev/null | grep -i "$pattern" | grep -q Running && return 0
+    i=$((i + 1)); printInfo "$pattern not Running yet ($i/$tries), waiting 10s"; sleep 10
+  done
+  return 1
+}
+
 # ActiveGate pod is Running in the dynatrace namespace (Section 2).
 checkActiveGateReady() {
-  [ -n "${LAB_WAIT:-}" ] && waitForPod dynatrace activegate
+  [ -n "${LAB_WAIT:-}" ] && _waitPodRunning dynatrace activegate
   if kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -i activegate | grep -q Running; then
     printInfo "ActiveGate pod is Running"; return 0
   fi
@@ -117,13 +130,80 @@ waitForOneAgentInjected() { LAB_WAIT=1 checkOneAgentInjected; }
 # container stdout — no pod restart and no code injection are involved, which is
 # exactly the point Section 2 makes.
 checkLogModuleReady() {
-  [ -n "${LAB_WAIT:-}" ] && waitForPod dynatrace logmonitoring
+  [ -n "${LAB_WAIT:-}" ] && _waitPodRunning dynatrace logmonitoring
   if kubectl get pods -n dynatrace --no-headers 2>/dev/null | grep -i logmonitoring | grep -q Running; then
     printInfo "Dynatrace log module is Running — your cluster's container logs are being captured"; return 0
+  fi
+  if kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | grep -q . \
+    && ! kubectl get dynakube -n dynatrace -o jsonpath='{.items[*].spec.logMonitoring}' 2>/dev/null | grep -q .; then
+    printError "The applied DynaKube has no logMonitoring section, so no log module will ever start — re-apply .devcontainer/yaml/gen/dynakube.yaml (or Run solution)"; return 1
   fi
   printError "Log module pod is not Running yet — it starts shortly after the DynaKube is applied; check again in a moment"; return 1
 }
 waitForLogModuleReady() { LAB_WAIT=1 checkLogModuleReady; }
+
+# ======================================================================
+#   Section 2 — DynaKube generation and deploy, safe to run concurrently
+# ----------------------------------------------------------------------
+#   The step's STEP_SETUP generates the DynaKube silently when the learner
+#   enters the step, and "Run solution" generated it AGAIN (the framework's
+#   deployApplicationMonitoring). Both wrote .devcontainer/yaml/gen/dynakube.yaml
+#   in place: the framework's generateDynakube writes the main body first,
+#   then looks up image tags in ECR for a few seconds, and only then appends
+#   `templates.logMonitoring` and `logMonitoring: {}`. A `kubectl apply` during
+#   that window applies a perfectly valid DynaKube WITHOUT the log module (the
+#   webhook accepts it), and two generations at once interleave into YAML that
+#   does not parse. Clicking "Run solution" right after entering the step hits
+#   exactly that window.
+#
+#   generateDynakubeAtomic writes into a private directory and renames the
+#   finished file into place, so a reader only ever sees a complete manifest,
+#   and refuses to publish one without logMonitoring. deployDynakube is the
+#   solution path: generate atomically, apply, then wait for the log module.
+# ======================================================================
+
+generateDynakubeAtomic() {
+  local gen_dir="$REPO_PATH/.devcontainer/yaml/gen" tmp rc
+  mkdir -p "$gen_dir" || return 1
+  # Same filesystem as the target, so the final mv is an atomic rename.
+  tmp="$(mktemp -d "$gen_dir/.tmp.XXXXXX")" || return 1
+  mkdir -p "$tmp/.devcontainer/yaml"
+  # loadDynakubeConfig reads the repo overrides from $REPO_PATH and the defaults
+  # from ${FRAMEWORK_CACHE:-$REPO_PATH}; carry both over before switching REPO_PATH.
+  cp "$REPO_PATH"/.devcontainer/yaml/dynakube-*.yaml "$tmp/.devcontainer/yaml/" 2>/dev/null
+  (
+    export FRAMEWORK_CACHE="${FRAMEWORK_CACHE:-$REPO_PATH}"
+    REPO_PATH="$tmp"
+    generateDynakube "$@"
+  )
+  rc=$?
+  if [ "$rc" -eq 0 ] && ! grep -q '^  logMonitoring:' "$tmp/.devcontainer/yaml/gen/dynakube.yaml" 2>/dev/null; then
+    printError "Generated DynaKube has no logMonitoring section — not publishing it"
+    rc=1
+  fi
+  [ "$rc" -eq 0 ] && mv -f "$tmp/.devcontainer/yaml/gen/dynakube.yaml" "$gen_dir/dynakube.yaml"
+  rc=$?
+  rm -rf "$tmp"
+  return "$rc"
+}
+
+# Section 2's LAB_SOLUTION: the AppOnly + log-ingest DynaKube, applied, with
+# the ActiveGate and the log module Running before it returns.
+deployDynakube() {
+  dynatraceEvalReadSaveCredentials
+  if [ -z "${DT_TENANT}" ]; then
+    printError "No Dynatrace credentials found — cannot deploy the DynaKube"; return 1
+  fi
+  generateDynakubeAtomic apponly || return 1
+  kubectl -n dynatrace wait pod --for=condition=ready \
+    --selector=app.kubernetes.io/name=dynatrace-operator,app.kubernetes.io/component=webhook \
+    --timeout=300s || { printError "Dynatrace webhook is not ready — deploy the Operator (Section 1) first"; return 1; }
+  kubectl -n dynatrace apply -f "$REPO_PATH/.devcontainer/yaml/gen/dynakube.yaml" || return 1
+  fixSprintActiveGateImage
+  fixSprintCodeModulesImage
+  LAB_WAIT=1 checkActiveGateReady || return 1
+  LAB_WAIT=1 checkLogModuleReady
+}
 
 # Create a TODO via the app's HTTP API (the same curl path the live-debugger lab
 # uses). The learner normally does this by hand in the app UI with any text they
