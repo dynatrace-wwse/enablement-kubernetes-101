@@ -689,7 +689,7 @@
 
 <!-- STEP_SETUP
 commands:
-  - dynatraceEvalReadSaveCredentials && generateDynakube
+  - dynatraceEvalReadSaveCredentials && generateDynakubeAtomic
 -->
 
 <h1 id="section-2-deploy-the-dynakube">Section 2 — Deploy the DynaKube<a class="headerlink" href="#section-2-deploy-the-dynakube" title="Permanent link">#</a></h1>
@@ -834,9 +834,8 @@ type: dql-verification
 question: "Verify the todoapp's container logs are reaching Dynatrace Grail"
 buttonText: "Check logs in Grail"
 dql: |
-  fetch logs, from:now()-15m
+  fetch logs, from:now()-30m
   | filter endsWith(k8s.cluster.name, "{{DT_SESSION_ID}}")
-  | filter k8s.namespace.name == "todoapp"
   | limit 1
 expect:
   operator: not-empty
@@ -847,15 +846,16 @@ explanation: "The todoapp's logs are in Grail — captured with no restart, no i
 <!-- LAB_SOLUTION
 reveal: |
   The DynaKube manifest is generated for you from your tenant credentials (the
-  `STEP_SETUP` on this step ran `dynatraceEvalReadSaveCredentials && generateDynakube`).
-  Apply it with `kubectl apply -f .devcontainer/yaml/gen/dynakube.yaml`. The framework
-  helper `deployApplicationMonitoring` generates and applies the AppOnly + log-ingest
-  DynaKube in one step — the "Run solution" button runs it and confirms the DynaKube CR exists.
+  `STEP_SETUP` on this step ran `dynatraceEvalReadSaveCredentials && generateDynakubeAtomic`).
+  Apply it with `kubectl apply -f .devcontainer/yaml/gen/dynakube.yaml`. The helper
+  `deployDynakube` regenerates and applies the AppOnly + log-ingest DynaKube in one step,
+  then waits for the ActiveGate and the log module to be Running — the "Run solution"
+  button runs it and confirms the DynaKube CR exists and the log module is up.
 commands:
-  - deployApplicationMonitoring
-  - fixSprintCodeModulesImage
+  - deployDynakube
 verify:
   - kubectl get dynakube -n dynatrace --no-headers 2>/dev/null | grep -q .
+  - checkLogModuleReady
 -->
 
 <h2 id="explore-your-cluster-in-dynatrace">Explore your cluster in Dynatrace<a class="headerlink" href="#explore-your-cluster-in-dynatrace" title="Permanent link">#</a></h2>
